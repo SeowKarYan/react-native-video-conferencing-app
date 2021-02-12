@@ -5,7 +5,7 @@ const { v4: uuidV4 } = require('uuid');
 
 io.on('connection',(socket) => {
     console.log('user connected');
-    socket.on('create-room',uuidV4())
+    socket.on('create-room',uuidV4());
     socket.on('disconnect',() => {
         console.log('user disconnect');
     });

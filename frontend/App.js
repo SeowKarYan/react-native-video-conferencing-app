@@ -1,40 +1,26 @@
-import React, { Component } from 'react';
-import { Text, Button, View } from 'react-native';
+import 'react-native-gesture-handler';
+
+import * as React from 'react';
 import io from "socket.io-client";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-class App extends Component {
+import LoginScreen from './screens/loginScreen';
+import MeetingScreen from './screens/meetingScreen';
+import InMeetingScreen from './screens/inMeetingScreen';
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      roomid: ""
-    }
-  }
+const Stack = createStackNavigator();
 
-  createMeeting(){
-    const socket = io("http://192.168.1.109:3000")
-    socket.on('create-room',(roomid)=>{
-      console.log(roomid);
-      this.setState({roomid: roomid})
-    })
-  }
-
-  joinMeeting(){
-
-  }
-
-  render() {
-    return (
-      <View>
-          <Button onPress={this.createMeeting()} title="Create Meeting" />
-          <Text>
-            {"RoomID:" + this.state.roomid}
-          </Text>
-      
-        <Button onPress={this.joinMeeting()} title="Join Meeting" />
-      </View>
-    );
-  }
-}
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Meeting" component={MeetingScreen} />
+        <Stack.Screen name="InMeeting" component={InMeetingScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 export default App;
