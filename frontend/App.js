@@ -15,9 +15,9 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Meeting" component={MeetingScreen} />
-        <Stack.Screen name="InMeeting" component={InMeetingScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{title: 'LOGIN',headerStyle:{backgroundColor: '#3949AB'},headerTintColor: 'white'}} />
+        <Stack.Screen name="Meeting" component={MeetingScreen} options={{title: 'HOME',headerStyle:{backgroundColor: '#3949AB'},headerTintColor: 'white'}} />
+        <Stack.Screen name="InMeeting" component={InMeetingScreen} options={{title: 'MEETING',headerStyle:{backgroundColor: '#3949AB'},headerTintColor: 'white'}} />
       </Stack.Navigator>
     </NavigationContainer>
   );
