@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { TextInput, View, Button, StyleSheet } from 'react-native';
 
 const MeetingScreen = ({ navigation }) => {
@@ -7,11 +7,12 @@ const MeetingScreen = ({ navigation }) => {
 
   return (
     <View>
-      <View style={{ paddingTop: 20 }}>
+      <View style={{ paddingVertical: 50,marginHorizontal: 20, }}>
         <Button title="Create Meeting" onPress={() => navigation.navigate('InMeeting')} />
       </View>
-      <TextInput placeholder="Please enter meeting code" onChangeText={meetingcode => setMeetingcode(meetingcode)} />
-      <View style={{ paddingTop: 20 }}>
+
+      <View style={{ marginHorizontal: 20, }}>
+        <TextInput style={{ paddingBottom: 20 }} placeholder="Please enter meeting code" onChangeText={meetingcode => setMeetingcode(meetingcode)} />
         <Button title="Join Meeting" onPress={() => navigation.navigate('InMeeting')} />
       </View>
     </View>
