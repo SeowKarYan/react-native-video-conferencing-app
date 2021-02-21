@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 
 import * as React from 'react';
-import io from "socket.io-client";
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -10,6 +10,8 @@ import MeetingScreen from './screens/meetingScreen';
 import InMeetingScreen from './screens/inMeetingScreen';
 
 const Stack = createStackNavigator();
+
+
 
 const App = () => {
   return (

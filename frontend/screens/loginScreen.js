@@ -10,7 +10,7 @@ const LoginScreen = ({ navigation }) => {
         <View>
             <Text style={styles.title}>Welcome</Text>
             <Text style={styles.label}>Username:</Text>
-            <TextInput style={styles.input} placeholder="Please enter username" onChangeText={username => setUsername(username)} />
+            <TextInput style={styles.input} placeholder="Please enter username" onChangeText={text => setUsername(text)} value={username}/>
             <View style={{ paddingTop: 20, marginHorizontal: 20, }}>
                 <Button title="Login" onPress={() => navigation.navigate('Meeting')} />
             </View>
