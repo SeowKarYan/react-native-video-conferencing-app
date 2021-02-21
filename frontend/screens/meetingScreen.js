@@ -5,6 +5,7 @@ import io from "socket.io-client";
 const MeetingScreen = ({ navigation }) => {
 
   const [meetingcode, setMeetingcode] = useState('');
+  const [userID, setUserID] = useState('');
 
 /*
   useEffect(() => {
@@ -17,20 +18,35 @@ const MeetingScreen = ({ navigation }) => {
 
   let createMeeting = () => {
     const socket = io("http://192.168.1.110:3000");
-    socket.on('createRoom',(roomID)=>{
+    socket.on('createRoom',(roomID, userID)=>{
       setMeetingcode(roomID);
+      setUserID(userID);
+      socket.emit('joinRoom',roomID,userID)
+      socket.on('userConnected',(userID)=>{
+        console.log(userID)
+      })
     })
+    
     //navigation.navigate('InMeeting');
   }
 
   let joinMeeting = () => {
-    navigation.navigate('InMeeting');
+    const socket = io("http://192.168.1.110:3000");
+    socket.on('getUserID',(userID)=>{
+      setUserID(userID);
+      socket.emit('joinRoom',meetingcode,userID)
+      socket.on('userConnected',(userID)=>{
+        console.log(userID)
+      })
+    })
+    //navigation.navigate('InMeeting');
   }
 
   return (
     <View>
       <View style={{ paddingVertical: 50, marginHorizontal: 20, }}>
         <Button title="Create Meeting" onPress={createMeeting} />
+        <Text>userID:{userID}</Text>
       </View>
 
       <View style={{ marginHorizontal: 20, }}>
