@@ -1,7 +1,17 @@
-const app = require('express')();
-const http = require('http').createServer(app);
+const express = require('express');
+const { ExpressPeerServer } = require('peer');
+const app = express();
+const http = require('http');
+
+const server = http.createServer(app);
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
+  path: '/myapp'
+});
 const io = require('socket.io')(http);
 const { v4: uuidV4 } = require('uuid');
+
+
 
 io.on('connection',(socket) => {
     console.log('user connected');
@@ -18,8 +28,10 @@ io.on('connection',(socket) => {
     });
 });
 
+app.use('/peerjs', peerServer);
 
-
+server.listen(3000);
+/*
 http.listen(3000, () => {
     console.log('listening on port 3000 ...');
-});
+});*/

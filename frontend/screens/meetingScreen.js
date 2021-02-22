@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput, View, Button, StyleSheet,Text } from 'react-native';
 import io from "socket.io-client";
+import Peer from 'react-native-peerjs';
 
 const MeetingScreen = ({ navigation }) => {
 
@@ -17,7 +18,12 @@ const MeetingScreen = ({ navigation }) => {
 */
 
   let createMeeting = () => {
-    const socket = io("http://192.168.1.110:3000");
+    const socket = io("http://192.168.1.111:3000");
+    
+    const myPeer = new Peer(undefined,{
+      host: '192.168.1.111',
+      port: '3001',
+    });
     socket.on('createRoom',(roomID, userID)=>{
       setMeetingcode(roomID);
       setUserID(userID);
@@ -31,7 +37,7 @@ const MeetingScreen = ({ navigation }) => {
   }
 
   let joinMeeting = () => {
-    const socket = io("http://192.168.1.110:3000");
+    const socket = io("http://192.168.1.111:3000");
     socket.on('getUserID',(userID)=>{
       setUserID(userID);
       socket.emit('joinRoom',meetingcode,userID)
