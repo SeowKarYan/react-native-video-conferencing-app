@@ -1,36 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TextInput, View, Button, StyleSheet,Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
-
-const myPeer = new Peer(undefined,{
-  host: '192.168.1.111',
-  secure: false,
-  port: '3001',
-  path: '/',
-});
+//import socketConnection from './serverConnection';
 
 const MeetingScreen = ({ navigation }) => {
 
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
 
-/*
   useEffect(() => {
-    const socket = io("http://192.168.1.110:3000");
-    socket.on('createRoom',(roomID)=>{
-      setMeetingcode(roomID);
+
+    const myPeer = new Peer(undefined,{
+      host: '192.168.1.111',
+      secure: false,
+      port: '3001',
+      path: '/',
+    });
+
+    myPeer.on('open', id => {
+      setUserID(id);
     })
   }, [])
-*/
+
 
   let createMeeting = () => {
     const socket = io("http://192.168.1.111:3000");
-    
-    
-    socket.on('createRoom',(roomID, userID)=>{
+    /*
+    const myPeer = new Peer(undefined,{
+      host: '192.168.1.111',
+      secure: false,
+      port: '3001',
+      path: '/',
+    });
+
+    myPeer.on('open', id => {
+      setUserID(id);
+    })
+    */
+    socket.on('createRoom',(roomID)=>{
       setMeetingcode(roomID);
-      setUserID(userID);
+      
       socket.emit('joinRoom',roomID,userID)
       socket.on('userConnected',(userID)=>{
         console.log(userID)
@@ -42,13 +52,12 @@ const MeetingScreen = ({ navigation }) => {
 
   let joinMeeting = () => {
     const socket = io("http://192.168.1.111:3000");
-    socket.on('getUserID',(userID)=>{
-      setUserID(userID);
-      socket.emit('joinRoom',meetingcode,userID)
-      socket.on('userConnected',(userID)=>{
-        console.log(userID)
-      })
+    
+    socket.emit('joinRoom',meetingcode,userID)
+    socket.on('userConnected',(userID)=>{
+      console.log(userID)
     })
+    
     //navigation.navigate('InMeeting');
   }
 

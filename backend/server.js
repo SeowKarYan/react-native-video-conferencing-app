@@ -5,8 +5,8 @@ const { v4: uuidV4 } = require('uuid');
 
 io.on('connection',(socket) => {
     console.log('user connected');
-    io.emit('createRoom', uuidV4(), socket.id);
-    io.emit('getUserID', socket.id);
+    io.emit('createRoom', uuidV4());
+    
     socket.on('joinRoom',(roomID,userID)=>{
         socket.join(roomID)
         socket.to(roomID).broadcast.emit('userConnected',userID)
