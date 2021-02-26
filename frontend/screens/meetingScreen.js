@@ -4,20 +4,14 @@ import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
 
 const socket = io("http://192.168.1.111:3000");
-/*
-const myPeer = new Peer(undefined,{
-  host: '192.168.1.111',
-  secure: false,
-  port: '3001',
-  path: '/',
-});
-*/
+
 const MeetingScreen = ({ navigation }) => {
 
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
 
   useEffect(() => {
+    
     const myPeer = new Peer(undefined,{
       host: '192.168.1.111',
       secure: false,
@@ -33,8 +27,8 @@ const MeetingScreen = ({ navigation }) => {
   let generateRoomID = () => (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
 
   let createMeeting = () => {
-    /*
-    const myPeer = new Peer(undefined,{
+    
+    const myPeer = new Peer(userID,{
       host: '192.168.1.111',
       secure: false,
       port: '3001',
@@ -42,9 +36,10 @@ const MeetingScreen = ({ navigation }) => {
     });
 
     myPeer.on('open', id => {
-      setUserID(id);
+      //setUserID(id);
+      console.log(id);
     })
-    */
+    
 /*
     socket.on('createRoom',(roomID)=>{
       setMeetingcode(roomID);
@@ -54,6 +49,10 @@ const MeetingScreen = ({ navigation }) => {
         console.log(userID)
       })
     })*/
+
+    myPeer.on('open', id => {
+      setUserID(id);
+    })
 
     const roomID = generateRoomID();
     setMeetingcode(roomID);
