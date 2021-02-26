@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import { TextInput, View, Button, StyleSheet,Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
@@ -9,9 +9,12 @@ const MeetingScreen = ({ navigation }) => {
 
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
-
+/*
   useEffect(() => {
     
+  }, [])*/
+
+  let peerConnection = () => {
     const myPeer = new Peer(undefined,{
       host: '192.168.1.111',
       secure: false,
@@ -19,45 +22,23 @@ const MeetingScreen = ({ navigation }) => {
       path: '/',
     });
 
-    myPeer.on('open', id => {
-      setUserID(id);
-    })
-  }, [])
+   return myPeer;
+  }
 
   let generateRoomID = () => (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
 
   let createMeeting = () => {
-    
-    const myPeer = new Peer(userID,{
-      host: '192.168.1.111',
-      secure: false,
-      port: '3001',
-      path: '/',
-    });
-
-    myPeer.on('open', id => {
-      //setUserID(id);
-      console.log(id);
-    })
-    
-/*
-    socket.on('createRoom',(roomID)=>{
-      setMeetingcode(roomID);
-      
-      socket.emit('joinRoom',roomID,userID)
-      socket.on('userConnected',(userID)=>{
-        console.log(userID)
-      })
-    })*/
-
-    myPeer.on('open', id => {
-      setUserID(id);
-    })
+   
+    const myPeer = peerConnection();
 
     const roomID = generateRoomID();
     setMeetingcode(roomID);
 
-    socket.emit('joinRoom',roomID,userID)
+    myPeer.on('open',id => {
+      setUserID(id);
+      socket.emit('joinRoom',roomID,id)
+    })
+
     socket.on('userConnected',(userID)=>{
         console.log(userID)
       })
