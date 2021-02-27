@@ -85,7 +85,9 @@ const MeetingScreen = ({ navigation }) => {
       console.log(userID)
     })
     
-    //navigation.navigate('InMeeting');
+    navigation.navigate('InMeeting',{
+      localStream: localStream
+    });
   }
 
   let joinMeeting = () => {
@@ -109,11 +111,7 @@ const MeetingScreen = ({ navigation }) => {
         <TextInput style={{ paddingBottom: 20 }} placeholder="Please enter meeting code" onChangeText={text => setMeetingcode(text)} value={meetingcode} />
         <Button title="Join Meeting" onPress={joinMeeting} />
       </View>
-      <View>
-        <RTCView style={{width: 150, height:150, borderColor: "red",backgroundColor: "black"}}
-          streamURL={localStream && localStream.toURL()}
-        />
-      </View>
+      
     </View>
 
   );
