@@ -19,7 +19,7 @@ const MeetingScreen = ({ navigation }) => {
 
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
-  const [stream, setStream] = useState();
+  const [localStream, setLocalStream] = useState();
 
   useEffect(() => {
     getStream();
@@ -60,7 +60,7 @@ const MeetingScreen = ({ navigation }) => {
         }
       })
         .then(stream => {
-          setStream(stream);
+          setLocalStream(stream);
           console.log(stream);
         })
         .catch(error => {
@@ -110,8 +110,8 @@ const MeetingScreen = ({ navigation }) => {
         <Button title="Join Meeting" onPress={joinMeeting} />
       </View>
       <View>
-        <RTCView
-          streamURL={stream && stream.toURL()}
+        <RTCView style={{width: 150, height:150, borderColor: "red",backgroundColor: "black"}}
+          streamURL={localStream && localStream.toURL()}
         />
       </View>
     </View>
