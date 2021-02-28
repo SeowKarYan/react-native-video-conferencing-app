@@ -13,21 +13,24 @@ import {
   registerGlobals
 } from 'react-native-webrtc';
 
-const socket = io("http://192.168.1.111:3000");
+// connect to server
+const socket = io("http://192.168.1.112:3000");
 
 const MeetingScreen = ({ navigation }) => {
 
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
   const [localStream, setLocalStream] = useState();
+  const [remoteStream, setRemoteStream] = useState();
 
   useEffect(() => {
     getStream();
   }, [])
 
+  // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.111',
+      host: '192.168.1.112',
       secure: false,
       port: '3001',
       path: '/',
@@ -64,11 +67,23 @@ const MeetingScreen = ({ navigation }) => {
           console.log(stream);
         })
         .catch(error => {
-          // Log error
+          console.log(error);
         });
     });
   }
-
+/*
+  let connectToNewUser = (userID, stream) => {
+    const call = myPeer.call(userID, stream);
+    call.on('stream', userVideoStream => {
+        setRemoteStream(userVideoStream);
+        console.log(userVideoStream);
+    })
+    
+    call.on('close', () => {
+        setRemoteStream(null);
+    })
+  }
+*/
   let createMeeting = () => {
 
     const myPeer = peerConnection();
@@ -78,26 +93,50 @@ const MeetingScreen = ({ navigation }) => {
 
     myPeer.on('open', id => {
       setUserID(id);
-      socket.emit('joinRoom', roomID, id)
+      socket.emit('join-room', roomID, id)
     })
-
+/*
+    myPeer.on('call',call => {
+      call.answer(localStream);
+    })*/
+    
     socket.on('userConnected', (userID) => {
-      console.log(userID)
+      //connectToNewUser(userID, localStream);
+      const call = myPeer.call(userID, localStream);
+      call.on('stream', userVideoStream => {
+          setRemoteStream(userVideoStream);
+          console.log(userVideoStream);
+      })
+      console.log("Create meeting: " + userID)
     })
     
     navigation.navigate('InMeeting',{
-      localStream: localStream
+      localStream: localStream,
+      remoteStream: remoteStream
     });
   }
 
   let joinMeeting = () => {
 
-    socket.emit('joinRoom', meetingcode, userID)
-    socket.on('userConnected', (userID) => {
-      console.log(userID)
+    const myPeer = peerConnection();
+
+    myPeer.on('open', id => {
+      setUserID(id);
+      socket.emit('join-room', meetingcode, id)
     })
 
-    //navigation.navigate('InMeeting');
+    myPeer.on('call',call => {
+      call.answer(localStream);
+    })
+
+    socket.on('userConnected', (userID) => {
+      console.log("join meeting: " + userID)
+    })
+
+    navigation.navigate('InMeeting',{
+      localStream: localStream,
+      remoteStream: remoteStream
+    });
   }
 
   return (
