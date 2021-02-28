@@ -112,7 +112,8 @@ const MeetingScreen = ({ navigation }) => {
     
     navigation.navigate('InMeeting',{
       localStream: localStream,
-      remoteStream: remoteStream
+      remoteStream: remoteStream,
+      roomID: roomID
     });
   }
 
@@ -135,7 +136,8 @@ const MeetingScreen = ({ navigation }) => {
 
     navigation.navigate('InMeeting',{
       localStream: localStream,
-      remoteStream: remoteStream
+      remoteStream: remoteStream,
+      roomID: meetingcode,
     });
   }
 

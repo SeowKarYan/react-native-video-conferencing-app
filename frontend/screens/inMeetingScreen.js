@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text,View } from 'react-native';
+import { StyleSheet, Text,View } from 'react-native';
 import {
   RTCPeerConnection,
   RTCIceCandidate,
@@ -12,10 +12,11 @@ import {
 } from 'react-native-webrtc';
 
 const InMeetingScreen = ({route, navigation}) => {
-  const { localStream,remoteStream } = route.params;
+  const { localStream, remoteStream, roomID } = route.params;
 
   return (
     <View>
+      <Text style={{paddingHorizontal: 90, paddingVertical:10}}>Room ID: {roomID}</Text>
         {localStream && <RTCView style={{width: 200, height:200, borderColor: "red",backgroundColor: "black"}}
           streamURL={localStream.toURL()}
         />}
