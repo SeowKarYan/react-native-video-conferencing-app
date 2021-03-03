@@ -22,10 +22,10 @@ const MeetingScreen = ({ navigation }) => {
   const [userID, setUserID] = useState('');
   const [localStream, setLocalStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
-/*
-  useEffect(() => {
-    
-  }, [])*/
+  /*
+    useEffect(() => {
+      
+    }, [])*/
 
   // connect to peer server
   let peerConnection = () => {
@@ -75,17 +75,17 @@ const MeetingScreen = ({ navigation }) => {
       })
         .then(stream => {
           setLocalStream(stream);
-          navigation.navigate('InMeeting',{
+          navigation.navigate('InMeeting', {
             localStream: stream,
             roomID: roomID
           });
           socket.on('userConnected', (userID) => {
             const call = myPeer.call(userID, stream);
             call.on('stream', userVideoStream => {
-                setRemoteStream(userVideoStream);
-                navigation.navigate('InMeeting',{
-                  remoteStream: userVideoStream,
-                });
+              setRemoteStream(userVideoStream);
+              navigation.navigate('InMeeting', {
+                remoteStream: userVideoStream,
+              });
             })
             call.on('close', () => {
               setRemoteStream(null);
@@ -132,22 +132,22 @@ const MeetingScreen = ({ navigation }) => {
       })
         .then(stream => {
           setLocalStream(stream);
-          myPeer.on('call',call => {
+          myPeer.on('call', call => {
             call.answer(stream);
             call.on('stream', userVideoStream => {
               setRemoteStream(userVideoStream);
-              navigation.navigate('InMeeting',{
+              navigation.navigate('InMeeting', {
                 localStream: stream,
                 remoteStream: userVideoStream,
                 roomID: meetingcode
               });
-          })
-          call.on('close', () => {
-            setRemoteStream(null);
-            navigation.navigate('InMeeting', {
-              remoteStream: null,
-            });
-          })
+            })
+            call.on('close', () => {
+              setRemoteStream(null);
+              navigation.navigate('InMeeting', {
+                remoteStream: null,
+              });
+            })
           })
         })
         .catch(error => {
@@ -167,7 +167,7 @@ const MeetingScreen = ({ navigation }) => {
         <TextInput style={{ paddingBottom: 20 }} placeholder="Please enter meeting code" onChangeText={text => setMeetingcode(text)} value={meetingcode} />
         <Button title="Join Meeting" onPress={joinMeeting} />
       </View>
-      
+
     </View>
 
   );
