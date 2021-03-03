@@ -14,7 +14,7 @@ import {
 } from 'react-native-webrtc';
 
 // connect to server
-const socket = io("http://192.168.1.112:3000");
+const socket = io("http://192.168.1.108:3000");
 
 const MeetingScreen = ({ navigation }) => {
 
@@ -22,15 +22,15 @@ const MeetingScreen = ({ navigation }) => {
   const [userID, setUserID] = useState('');
   const [localStream, setLocalStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
-
+/*
   useEffect(() => {
-    getStream();
-  }, [])
+    
+  }, [])*/
 
   // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.112',
+      host: '192.168.1.108',
       secure: false,
       port: '3001',
       path: '/',
@@ -41,7 +41,18 @@ const MeetingScreen = ({ navigation }) => {
 
   let generateRoomID = () => (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
 
-  let getStream = () => {
+  let createMeeting = () => {
+
+    const myPeer = peerConnection();
+
+    const roomID = generateRoomID();
+    setMeetingcode(roomID);
+
+    myPeer.on('open', id => {
+      setUserID(id);
+      socket.emit('join-room', roomID, id)
+    })
+
     let isFront = true;
     mediaDevices.enumerateDevices().then(sourceInfos => {
       console.log(sourceInfos);
@@ -64,56 +75,27 @@ const MeetingScreen = ({ navigation }) => {
       })
         .then(stream => {
           setLocalStream(stream);
-          console.log(stream);
+          navigation.navigate('InMeeting',{
+            localStream: stream,
+            roomID: roomID
+          });
+          socket.on('userConnected', (userID) => {
+            const call = myPeer.call(userID, stream);
+            call.on('stream', userVideoStream => {
+                setRemoteStream(userVideoStream);
+                navigation.navigate('InMeeting',{
+                  localStream: stream,
+                  remoteStream: userVideoStream,
+                  roomID: roomID
+                });
+            })
+            console.log("Create meeting: " + userID)
+            
+          })
         })
         .catch(error => {
           console.log(error);
         });
-    });
-  }
-/*
-  let connectToNewUser = (userID, stream) => {
-    const call = myPeer.call(userID, stream);
-    call.on('stream', userVideoStream => {
-        setRemoteStream(userVideoStream);
-        console.log(userVideoStream);
-    })
-    
-    call.on('close', () => {
-        setRemoteStream(null);
-    })
-  }
-*/
-  let createMeeting = () => {
-
-    const myPeer = peerConnection();
-
-    const roomID = generateRoomID();
-    setMeetingcode(roomID);
-
-    myPeer.on('open', id => {
-      setUserID(id);
-      socket.emit('join-room', roomID, id)
-    })
-/*
-    myPeer.on('call',call => {
-      call.answer(localStream);
-    })*/
-    
-    socket.on('userConnected', (userID) => {
-      //connectToNewUser(userID, localStream);
-      const call = myPeer.call(userID, localStream);
-      call.on('stream', userVideoStream => {
-          setRemoteStream(userVideoStream);
-          console.log(userVideoStream);
-      })
-      console.log("Create meeting: " + userID)
-    })
-    
-    navigation.navigate('InMeeting',{
-      localStream: localStream,
-      remoteStream: remoteStream,
-      roomID: roomID
     });
   }
 
@@ -126,18 +108,43 @@ const MeetingScreen = ({ navigation }) => {
       socket.emit('join-room', meetingcode, id)
     })
 
-    myPeer.on('call',call => {
-      call.answer(localStream);
-    })
-
-    socket.on('userConnected', (userID) => {
-      console.log("join meeting: " + userID)
-    })
-
-    navigation.navigate('InMeeting',{
-      localStream: localStream,
-      remoteStream: remoteStream,
-      roomID: meetingcode,
+    let isFront = true;
+    mediaDevices.enumerateDevices().then(sourceInfos => {
+      console.log(sourceInfos);
+      let videoSourceId;
+      for (let i = 0; i < sourceInfos.length; i++) {
+        const sourceInfo = sourceInfos[i];
+        if (sourceInfo.kind == "videoinput" && sourceInfo.facing == (isFront ? "front" : "environment")) {
+          videoSourceId = sourceInfo.deviceId;
+        }
+      }
+      mediaDevices.getUserMedia({
+        audio: true,
+        video: {
+          width: 640,
+          height: 480,
+          frameRate: 30,
+          facingMode: (isFront ? "user" : "environment"),
+          deviceId: videoSourceId
+        }
+      })
+        .then(stream => {
+          setLocalStream(stream);
+          myPeer.on('call',call => {
+            call.answer(stream);
+            call.on('stream', userVideoStream => {
+              setRemoteStream(userVideoStream);
+              navigation.navigate('InMeeting',{
+                localStream: stream,
+                remoteStream: userVideoStream,
+                roomID: meetingcode
+              });
+          })
+          })
+        })
+        .catch(error => {
+          console.log(error);
+        });
     });
   }
 
