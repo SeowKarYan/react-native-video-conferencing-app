@@ -1,13 +1,11 @@
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const { v4: uuidV4 } = require('uuid');
 
 io.on('connection',(socket) => {
     console.log('user connected');
-    io.emit('createRoom', uuidV4(), socket.id);
-    io.emit('getUserID', socket.id);
-    socket.on('joinRoom',(roomID,userID)=>{
+    
+    socket.on('join-room',(roomID,userID)=>{
         socket.join(roomID)
         socket.to(roomID).broadcast.emit('userConnected',userID)
         console.log("userID:" + userID);
@@ -17,8 +15,6 @@ io.on('connection',(socket) => {
         console.log('user disconnect');
     });
 });
-
-
 
 http.listen(3000, () => {
     console.log('listening on port 3000 ...');
