@@ -14,7 +14,7 @@ import {
 } from 'react-native-webrtc';
 
 // connect to server
-const socket = io("http://192.168.1.108:3000");
+const socket = io("http://192.168.1.106:3000");
 
 const MeetingScreen = ({ navigation }) => {
 
@@ -30,7 +30,7 @@ const MeetingScreen = ({ navigation }) => {
   // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.108',
+      host: '192.168.1.106',
       secure: false,
       port: '3001',
       path: '/',
@@ -87,7 +87,12 @@ const MeetingScreen = ({ navigation }) => {
                   remoteStream: userVideoStream,
                 });
             })
-            
+            call.on('close', () => {
+              setRemoteStream(null);
+              navigation.navigate('InMeeting', {
+                remoteStream: null,
+              });
+            })
           })
         })
         .catch(error => {
@@ -136,6 +141,12 @@ const MeetingScreen = ({ navigation }) => {
                 remoteStream: userVideoStream,
                 roomID: meetingcode
               });
+          })
+          call.on('close', () => {
+            setRemoteStream(null);
+            navigation.navigate('InMeeting', {
+              remoteStream: null,
+            });
           })
           })
         })
