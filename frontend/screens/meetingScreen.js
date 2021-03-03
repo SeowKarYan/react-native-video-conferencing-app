@@ -84,12 +84,9 @@ const MeetingScreen = ({ navigation }) => {
             call.on('stream', userVideoStream => {
                 setRemoteStream(userVideoStream);
                 navigation.navigate('InMeeting',{
-                  localStream: stream,
                   remoteStream: userVideoStream,
-                  roomID: roomID
                 });
             })
-            console.log("Create meeting: " + userID)
             
           })
         })
