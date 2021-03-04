@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   RTCPeerConnection,
   RTCIceCandidate,
@@ -45,15 +45,9 @@ const InMeetingScreen = ({ route, navigation }) => {
         />}
       </View>
       <View style={{ marginHorizontal: 20, marginTop: 10 }}>
-        <MaterialIcon name={'flip-camera-ios'} size={30} onPress={switchCamera} />
-        <Button
-          onPress={turnCamera}
-          title={'camera'}
-        />
-        <Button
-          onPress={turnMic}
-          title={'mic'}
-        />
+        <Icon name={`${ camera && 'camera' || 'camera-off'}`} size={30} onPress={turnCamera}/>
+        <Icon name={`${ mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic}/>
+        <Icon name={'camera-switch'} size={30} onPress={switchCamera} />
       </View>
 
 
