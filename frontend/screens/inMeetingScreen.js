@@ -14,9 +14,23 @@ import {
 
 const InMeetingScreen = ({ route, navigation }) => {
   const { localStream, remoteStream, roomID } = route.params;
+  const [camera, setCamera] = useState(true);
+  const [mic, setMic] = useState(true);
 
   let switchCamera = () => {
     localStream.getVideoTracks().forEach(track => track._switchCamera());
+  };
+
+  let turnCamera = () => {
+    const videoTrack = localStream.getTracks().filter(track => track.kind === 'video')
+    videoTrack[0].enabled = !videoTrack[0].enabled
+    setCamera(videoTrack[0].enabled);
+  };
+
+  let turnMic = () => {
+    const audioTrack = localStream.getTracks().filter(track => track.kind === 'audio')
+    audioTrack[0].enabled = !audioTrack[0].enabled
+    setMic(audioTrack[0].enabled);
   };
 
   return (
@@ -32,6 +46,14 @@ const InMeetingScreen = ({ route, navigation }) => {
       </View>
       <View style={{ marginHorizontal: 20, marginTop: 10 }}>
         <MaterialIcon name={'flip-camera-ios'} size={30} onPress={switchCamera} />
+        <Button
+          onPress={turnCamera}
+          title={'camera'}
+        />
+        <Button
+          onPress={turnMic}
+          title={'mic'}
+        />
       </View>
 
 
