@@ -44,13 +44,11 @@ const InMeetingScreen = ({ route, navigation }) => {
           streamURL={remoteStream.toURL()}
         />}
       </View>
-      <View style={{ marginHorizontal: 20, marginTop: 10 }}>
-        <Icon name={`${ camera && 'camera' || 'camera-off'}`} size={30} onPress={turnCamera}/>
-        <Icon name={`${ mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic}/>
-        <Icon name={'camera-switch'} size={30} onPress={switchCamera} />
+      <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', justifyContent: 'center' }}>
+        <Icon style={{ paddingHorizontal: 5 }} name={`${camera && 'camera' || 'camera-off'}`} size={30} onPress={turnCamera} />
+        <Icon style={{ paddingHorizontal: 5 }} name={`${mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic} />
+        <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
       </View>
-
-
     </View>
 
   );
