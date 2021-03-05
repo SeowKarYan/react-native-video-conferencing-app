@@ -16,6 +16,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   const { localStream, remoteStream, roomID } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
+  const [screen, setScreen] = useState(false);
 
   let switchCamera = () => {
     localStream.getVideoTracks().forEach(track => track._switchCamera());
@@ -33,6 +34,10 @@ const InMeetingScreen = ({ route, navigation }) => {
     setMic(audioTrack[0].enabled);
   };
 
+  let shareScreen = () => {
+    setScreen(!screen);
+  };
+
   return (
     <View>
       <View>
@@ -48,6 +53,7 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={`${camera && 'camera' || 'camera-off'}`} size={30} onPress={turnCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic} />
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
+        <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
       </View>
     </View>
 
