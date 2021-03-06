@@ -3,14 +3,7 @@ import { TextInput, View, Button, StyleSheet, Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
 import {
-  RTCPeerConnection,
-  RTCIceCandidate,
-  RTCSessionDescription,
-  RTCView,
-  MediaStream,
-  MediaStreamTrack,
   mediaDevices,
-  registerGlobals
 } from 'react-native-webrtc';
 
 // connect to server
@@ -74,6 +67,7 @@ const MeetingScreen = ({ navigation }) => {
         }
       })
         .then(stream => {
+          console.log("host stream:" + stream);
           setLocalStream(stream);
           navigation.navigate('InMeeting', {
             localStream: stream,
