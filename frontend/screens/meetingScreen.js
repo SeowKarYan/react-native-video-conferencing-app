@@ -82,19 +82,8 @@ const MeetingScreen = ({ navigation }) => {
               navigation.navigate('InMeeting', {
                 remoteStream: userVideoStream,
                 otherUserID: userID
-                //currentPeer: call.peerConnection
               });
             })
-            /*
-            socket.on('getSharedStream',stream => {
-              console.log('get shared stream:' + stream);
-              call.peerConnection.getSenders()[1].replaceTrack(stream);
-              
-              navigation.navigate('InMeeting', {
-                //remoteStream: stream,
-                //shareStream: stream,
-              });
-            })*/
 
             call.on('close', () => {
               setRemoteStream(null);
@@ -150,7 +139,6 @@ const MeetingScreen = ({ navigation }) => {
                 remoteStream: userVideoStream,
                 roomID: meetingcode,
                 //otherUserID: call.peer.id,
-                //currentPeer: call.peerConnection
               });
             })
             call.on('close', () => {

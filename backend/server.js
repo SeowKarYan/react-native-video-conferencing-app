@@ -12,12 +12,6 @@ io.on('connection',(socket) => {
         console.log("roomID:" + roomID);
         
     })
-    /*
-    socket.on('shareScreen', (stream) => {
-        console.log("get share stream:" + stream);
-        socket.broadcast.emit('getSharedStream', stream);
-        
-    })*/
 
     socket.on('disconnect',() => {
         console.log('user disconnect');

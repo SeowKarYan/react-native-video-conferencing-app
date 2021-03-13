@@ -12,20 +12,20 @@ import {
 //const socket = io("http://192.168.1.106:3000");
 
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID, otherUserID} = route.params;
+  const { localStream, remoteStream, roomID, otherUserID } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
   const [screenShare, setScreenShare] = useState();
   const [otherStream, setOtherStream] = useState();
   //const [myStream, setMyStream] = useState();
-/*
-  useEffect(() => {
-    setMyStream(localStream);
- }, [])*/
+  /*
+    useEffect(() => {
+      setMyStream(localStream);
+   }, [])*/
 
   useEffect(() => {
-     setOtherStream(remoteStream);
+    setOtherStream(remoteStream);
   }, [remoteStream])
 
   // connect to peer server
@@ -56,7 +56,8 @@ const InMeetingScreen = ({ route, navigation }) => {
     setMic(audioTrack[0].enabled);
   };
 
-  let shareScreen = () => {
+  let startShareScreen = () => {
+    startService();
     setScreen(!screen);
 
     const myPeer = peerConnection();
@@ -67,34 +68,33 @@ const InMeetingScreen = ({ route, navigation }) => {
       },
       audio: false
     }).then((stream) => {
-      //console.log("Share screen:" + stream);
       setScreenShare(stream);
       //setMyStream(stream);
       const call = myPeer.call(otherUserID, stream);
-      /*
-      call.on('stream', userVideoStream => {
-        setOtherStream(userVideoStream);
-      })*/
-
-      //currentPeer.getSenders()[1].replaceTrack(stream);
-      /*
-      let videoTrack = stream.getVideoTracks()[0];
-      let sender = currentPeer.getSenders().find(s => {
-        return s.track.kind == videoTrack.kind
-      })
-      sender.replaceTrack(videoTrack);*/
-
-      //socket.emit('shareScreen', stream);
 
     }).catch((error) => {
       console.log(error);
     })
-  };
-/*
-  socket.on('getSharedStream',stream => {
-    console.log('get shared stream:' + stream);
-    setScreenShare(stream);
-  })*/
+  }
+
+  let stopShareScreen = () => {
+    setScreen(!screen);
+    stopService();
+  }
+
+  let shareScreen = () => {
+
+    if (screen === false) {
+     startShareScreen();
+    }else{
+      stopShareScreen();
+    }
+  }
+  /*
+    socket.on('getSharedStream',stream => {
+      console.log('get shared stream:' + stream);
+      setScreenShare(stream);
+    })*/
 
   async function startService() {
 
@@ -142,8 +142,6 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
       </View>
-      <Button title="Start foreground service" onPress={startService} />
-      <Button title="Stop foreground service" onPress={stopService} />
     </View>
 
   );
