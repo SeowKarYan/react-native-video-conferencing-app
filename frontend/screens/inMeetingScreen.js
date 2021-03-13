@@ -18,11 +18,11 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [screen, setScreen] = useState(false);
   const [screenShare, setScreenShare] = useState();
   const [otherStream, setOtherStream] = useState();
-  //const [myStream, setMyStream] = useState();
-  /*
+  const [myStream, setMyStream] = useState();
+  
     useEffect(() => {
       setMyStream(localStream);
-   }, [])*/
+   }, [])
 
   useEffect(() => {
     setOtherStream(remoteStream);
@@ -68,8 +68,8 @@ const InMeetingScreen = ({ route, navigation }) => {
       },
       audio: false
     }).then((stream) => {
-      setScreenShare(stream);
-      //setMyStream(stream);
+      //setScreenShare(stream);
+      setMyStream(stream);
       const call = myPeer.call(otherUserID, stream);
 
     }).catch((error) => {
@@ -79,6 +79,7 @@ const InMeetingScreen = ({ route, navigation }) => {
 
   let stopShareScreen = () => {
     setScreen(!screen);
+    setMyStream(localStream);
     stopService();
   }
 
@@ -123,13 +124,9 @@ const InMeetingScreen = ({ route, navigation }) => {
     <View>
       <View>
         <Text style={{ paddingHorizontal: 90, paddingVertical: 10 }}>Room ID: {roomID}</Text>
-        <View>
-          {screenShare && <RTCView style={{ width: 400, height: 300, borderColor: "red", backgroundColor: "black" }}
-            streamURL={screenShare.toURL()}
-          />}</View>
         <View style={{ flexDirection: 'row', }}>
-          {localStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
-            streamURL={localStream.toURL()}
+          {myStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
+            streamURL={myStream.toURL()}
           />}
           {otherStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
             streamURL={otherStream.toURL()}
