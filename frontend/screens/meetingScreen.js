@@ -7,7 +7,7 @@ import {
 } from 'react-native-webrtc';
 
 // connect to server
-const socket = io("http://192.168.1.102:3000");
+const socket = io("http://192.168.1.104:3000");
 
 const MeetingScreen = ({ navigation }) => {
 
@@ -15,15 +15,16 @@ const MeetingScreen = ({ navigation }) => {
   const [userID, setUserID] = useState('');
   const [localStream, setLocalStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
+  const [otherUserID, setOtherUserID] = useState();
   /*
     useEffect(() => {
-      
+     
     }, [])*/
 
   // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.102',
+      host: '192.168.1.104',
       secure: false,
       port: '3001',
       path: '/',
@@ -67,20 +68,34 @@ const MeetingScreen = ({ navigation }) => {
         }
       })
         .then(stream => {
-          console.log("host stream:" + stream);
+          console.log("Local stream:" + stream);
           setLocalStream(stream);
           navigation.navigate('InMeeting', {
             localStream: stream,
-            roomID: roomID
+            roomID: roomID,
           });
           socket.on('userConnected', (userID) => {
+            setOtherUserID(userID);
             const call = myPeer.call(userID, stream);
             call.on('stream', userVideoStream => {
               setRemoteStream(userVideoStream);
               navigation.navigate('InMeeting', {
                 remoteStream: userVideoStream,
+                otherUserID: userID
+                //currentPeer: call.peerConnection
               });
             })
+            /*
+            socket.on('getSharedStream',stream => {
+              console.log('get shared stream:' + stream);
+              call.peerConnection.getSenders()[1].replaceTrack(stream);
+              
+              navigation.navigate('InMeeting', {
+                //remoteStream: stream,
+                //shareStream: stream,
+              });
+            })*/
+
             call.on('close', () => {
               setRemoteStream(null);
               navigation.navigate('InMeeting', {
@@ -133,7 +148,9 @@ const MeetingScreen = ({ navigation }) => {
               navigation.navigate('InMeeting', {
                 localStream: stream,
                 remoteStream: userVideoStream,
-                roomID: meetingcode
+                roomID: meetingcode,
+                //otherUserID: call.peer.id,
+                //currentPeer: call.peerConnection
               });
             })
             call.on('close', () => {

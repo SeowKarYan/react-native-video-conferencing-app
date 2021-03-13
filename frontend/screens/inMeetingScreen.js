@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
+import io from "socket.io-client";
+import Peer from 'react-native-peerjs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import VIForegroundService from '@voximplant/react-native-foreground-service';
 import {
@@ -7,12 +9,36 @@ import {
   mediaDevices,
 } from 'react-native-webrtc';
 
+//const socket = io("http://192.168.1.106:3000");
+
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID } = route.params;
+  const { localStream, remoteStream, roomID, otherUserID} = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
   const [screenShare, setScreenShare] = useState();
+  const [otherStream, setOtherStream] = useState();
+  //const [myStream, setMyStream] = useState();
+/*
+  useEffect(() => {
+    setMyStream(localStream);
+ }, [])*/
+
+  useEffect(() => {
+     setOtherStream(remoteStream);
+  }, [remoteStream])
+
+  // connect to peer server
+  let peerConnection = () => {
+    const myPeer = new Peer(undefined, {
+      host: '192.168.1.104',
+      secure: false,
+      port: '3001',
+      path: '/',
+    });
+
+    return myPeer;
+  }
 
   let switchCamera = () => {
     localStream.getVideoTracks().forEach(track => track._switchCamera());
@@ -33,18 +59,42 @@ const InMeetingScreen = ({ route, navigation }) => {
   let shareScreen = () => {
     setScreen(!screen);
 
+    const myPeer = peerConnection();
+
     mediaDevices.getDisplayMedia({
       video: {
         cursor: 'always',
       },
       audio: false
     }).then((stream) => {
-      console.log("share screen:" + stream);
+      //console.log("Share screen:" + stream);
       setScreenShare(stream);
+      //setMyStream(stream);
+      const call = myPeer.call(otherUserID, stream);
+      /*
+      call.on('stream', userVideoStream => {
+        setOtherStream(userVideoStream);
+      })*/
+
+      //currentPeer.getSenders()[1].replaceTrack(stream);
+      /*
+      let videoTrack = stream.getVideoTracks()[0];
+      let sender = currentPeer.getSenders().find(s => {
+        return s.track.kind == videoTrack.kind
+      })
+      sender.replaceTrack(videoTrack);*/
+
+      //socket.emit('shareScreen', stream);
+
     }).catch((error) => {
       console.log(error);
     })
   };
+/*
+  socket.on('getSharedStream',stream => {
+    console.log('get shared stream:' + stream);
+    setScreenShare(stream);
+  })*/
 
   async function startService() {
 
@@ -73,15 +123,18 @@ const InMeetingScreen = ({ route, navigation }) => {
     <View>
       <View>
         <Text style={{ paddingHorizontal: 90, paddingVertical: 10 }}>Room ID: {roomID}</Text>
-        {localStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
-          streamURL={localStream.toURL()}
-        />}
-        {remoteStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
-          streamURL={remoteStream.toURL()}
-        />}
-        {screenShare && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
-          streamURL={screenShare.toURL()}
-        />}
+        <View>
+          {screenShare && <RTCView style={{ width: 400, height: 300, borderColor: "red", backgroundColor: "black" }}
+            streamURL={screenShare.toURL()}
+          />}</View>
+        <View style={{ flexDirection: 'row', }}>
+          {localStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
+            streamURL={localStream.toURL()}
+          />}
+          {otherStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
+            streamURL={otherStream.toURL()}
+          />}
+        </View>
       </View>
       <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', justifyContent: 'center' }}>
         <Icon style={{ paddingHorizontal: 5 }} name={`${camera && 'camera' || 'camera-off'}`} size={30} onPress={turnCamera} />
