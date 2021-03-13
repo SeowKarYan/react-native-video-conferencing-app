@@ -19,10 +19,10 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [screenShare, setScreenShare] = useState();
   const [otherStream, setOtherStream] = useState();
   const [myStream, setMyStream] = useState();
-  
-    useEffect(() => {
-      setMyStream(localStream);
-   }, [])
+
+  useEffect(() => {
+    setMyStream(localStream);
+  }, [])
 
   useEffect(() => {
     setOtherStream(remoteStream);
@@ -56,46 +56,36 @@ const InMeetingScreen = ({ route, navigation }) => {
     setMic(audioTrack[0].enabled);
   };
 
-  let startShareScreen = () => {
-    startService();
-    setScreen(!screen);
+  let shareScreen = () => {
 
     const myPeer = peerConnection();
 
-    mediaDevices.getDisplayMedia({
-      video: {
-        cursor: 'always',
-      },
-      audio: false
-    }).then((stream) => {
-      //setScreenShare(stream);
-      setMyStream(stream);
-      const call = myPeer.call(otherUserID, stream);
-
-    }).catch((error) => {
-      console.log(error);
-    })
-  }
-
-  let stopShareScreen = () => {
-    setScreen(!screen);
-    setMyStream(localStream);
-    stopService();
-  }
-
-  let shareScreen = () => {
-
     if (screen === false) {
-     startShareScreen();
-    }else{
-      stopShareScreen();
+
+      startService();
+      setScreen(!screen);
+
+      mediaDevices.getDisplayMedia({
+        video: {
+          cursor: 'always',
+        },
+        audio: false
+      }).then((stream) => {
+        //setScreenShare(stream);
+        setMyStream(stream);
+        myPeer.call(otherUserID, stream);
+
+      }).catch((error) => {
+        console.log(error);
+      })
+
+    } else {
+      setScreen(!screen);
+      setMyStream(localStream);
+      stopService();
+      myPeer.call(otherUserID, localStream);
     }
   }
-  /*
-    socket.on('getSharedStream',stream => {
-      console.log('get shared stream:' + stream);
-      setScreenShare(stream);
-    })*/
 
   async function startService() {
 
