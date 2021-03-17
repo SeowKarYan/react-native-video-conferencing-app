@@ -31,7 +31,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.104',
+      host: '192.168.1.108',
       secure: false,
       port: '3001',
       path: '/',
@@ -128,6 +128,7 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={`${mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic} />
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
+        <Icon style={{ paddingHorizontal: 5 }} name={`comment-text-multiple`} size={30} />
       </View>
     </View>
 
