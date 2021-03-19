@@ -16,7 +16,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
-  const [screenShare, setScreenShare] = useState();
+  //const [screenShare, setScreenShare] = useState();
   const [otherStream, setOtherStream] = useState();
   const [myStream, setMyStream] = useState();
 
@@ -128,7 +128,7 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={`${mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic} />
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
-        <Icon style={{ paddingHorizontal: 5 }} name={`comment-text-multiple`} size={30} />
+        <Icon style={{ paddingHorizontal: 5 }} name={`comment-text-multiple`} size={30} onPress={() => navigation.navigate('MeetingChat')} />
       </View>
     </View>
 
