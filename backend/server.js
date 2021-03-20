@@ -10,12 +10,12 @@ io.on('connection',(socket) => {
         socket.to(roomID).broadcast.emit('userConnected',userID)
         console.log("userID:" + userID);
         console.log("roomID:" + roomID);
-        
-    })
 
-    socket.on('chat', (meetingchat) => {
-        console.log(meetingchat);
-        io.emit('chat', meetingchat);
+        socket.to(roomID).on('chat', meetingchat => {
+            console.log(meetingchat);
+            io.to(roomID).emit('chat',meetingchat);
+        })
+        
     })
 
     socket.on('disconnect',() => {
