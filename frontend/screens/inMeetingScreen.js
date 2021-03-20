@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import io from "socket.io-client";
-import Peer from 'react-native-peerjs';
+//import Peer from 'react-native-peerjs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import VIForegroundService from '@voximplant/react-native-foreground-service';
 import {
@@ -9,19 +8,18 @@ import {
   mediaDevices,
 } from 'react-native-webrtc';
 
-//const socket = io("http://192.168.1.106:3000");
-
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID, otherUserID } = route.params;
+  const { localStream, remoteStream, roomID, otherUserID, peer } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
-  //const [screenShare, setScreenShare] = useState();
   const [otherStream, setOtherStream] = useState();
   const [myStream, setMyStream] = useState();
+  const [myPeer, setMyPeer] = useState();
 
   useEffect(() => {
     setMyStream(localStream);
+    setMyPeer(peer);
   }, [])
 
   useEffect(() => {
@@ -29,6 +27,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   }, [remoteStream])
 
   // connect to peer server
+  /*
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
       host: '192.168.1.108',
@@ -38,7 +37,7 @@ const InMeetingScreen = ({ route, navigation }) => {
     });
 
     return myPeer;
-  }
+  }*/
 
   let switchCamera = () => {
     localStream.getVideoTracks().forEach(track => track._switchCamera());
@@ -58,7 +57,7 @@ const InMeetingScreen = ({ route, navigation }) => {
 
   let shareScreen = () => {
 
-    const myPeer = peerConnection();
+    //const myPeer = peerConnection();
 
     if (screen === false) {
 
@@ -71,7 +70,6 @@ const InMeetingScreen = ({ route, navigation }) => {
         },
         audio: false
       }).then((stream) => {
-        //setScreenShare(stream);
         setMyStream(stream);
         myPeer.call(otherUserID, stream);
 

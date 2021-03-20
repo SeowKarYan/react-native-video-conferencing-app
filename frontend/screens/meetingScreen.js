@@ -13,9 +13,7 @@ const MeetingScreen = ({ navigation }) => {
 
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
-  const [localStream, setLocalStream] = useState();
-  const [remoteStream, setRemoteStream] = useState();
-  const [otherUserID, setOtherUserID] = useState();
+
   /*
     useEffect(() => {
      
@@ -70,21 +68,18 @@ const MeetingScreen = ({ navigation }) => {
         }
       })
         .then(stream => {
-          console.log("Local stream:" + stream);
-          setLocalStream(stream);
           navigation.navigate('InMeeting', {
             localStream: stream,
             roomID: roomID,
+            peer: myPeer,
           });
 
           // when participate is joinning into the room
           socket.on('userConnected', (userID) => {
-            setOtherUserID(userID);
 
             // host calling the participate
             const call = myPeer.call(userID, stream);
             call.on('stream', userVideoStream => {
-              setRemoteStream(userVideoStream);
               navigation.navigate('InMeeting', {
                 remoteStream: userVideoStream,
                 otherUserID: userID
@@ -95,7 +90,6 @@ const MeetingScreen = ({ navigation }) => {
             myPeer.on('call', call => {
               call.answer(stream);
               call.on('stream', userVideoStream => {
-                setRemoteStream(userVideoStream);
                 navigation.navigate('InMeeting', {
                   remoteStream: userVideoStream,
                 });
@@ -104,7 +98,6 @@ const MeetingScreen = ({ navigation }) => {
 
             // leave the meeting
             call.on('close', () => {
-              setRemoteStream(null);
               navigation.navigate('InMeeting', {
                 remoteStream: null,
               });
@@ -150,24 +143,22 @@ const MeetingScreen = ({ navigation }) => {
         }
       })
         .then(stream => {
-          setLocalStream(stream);
 
           // participate answer the call
           myPeer.on('call', call => {
             call.answer(stream);
             call.on('stream', userVideoStream => {
-              setRemoteStream(userVideoStream);
               navigation.navigate('InMeeting', {
                 localStream: stream,
                 remoteStream: userVideoStream,
                 roomID: meetingcode,
                 otherUserID: call.peer,
+                peer: myPeer,
               });
             })
 
             // when leaving the meeting
             call.on('close', () => {
-              setRemoteStream(null);
               navigation.navigate('InMeeting', {
                 remoteStream: null,
               });
