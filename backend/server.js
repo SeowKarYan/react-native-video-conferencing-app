@@ -13,6 +13,11 @@ io.on('connection',(socket) => {
         
     })
 
+    socket.on('chat', (meetingchat) => {
+        console.log(meetingchat);
+        io.emit('chat', meetingchat);
+    })
+
     socket.on('disconnect',() => {
         console.log('user disconnect');
     });

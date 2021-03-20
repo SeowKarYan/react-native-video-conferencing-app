@@ -7,7 +7,7 @@ import {
 } from 'react-native-webrtc';
 
 // connect to socket server
-const socket = io("http://192.168.1.108:3000");
+export const socket = io("http://192.168.1.108:3000");
 
 const MeetingScreen = ({ navigation }) => {
 
