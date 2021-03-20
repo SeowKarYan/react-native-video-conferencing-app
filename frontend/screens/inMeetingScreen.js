@@ -127,6 +127,7 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
         <Icon style={{ paddingHorizontal: 5 }} name={`comment-text-multiple`} size={30} onPress={() => navigation.navigate('MeetingChat',{username: username})} />
+        <Icon style={{ paddingHorizontal: 5 }} name={`notebook`} size={30} onPress={() => navigation.navigate('MeetingNote')} />
       </View>
     </View>
 
