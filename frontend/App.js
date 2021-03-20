@@ -9,6 +9,7 @@ import LoginScreen from './screens/loginScreen';
 import MeetingScreen from './screens/meetingScreen';
 import InMeetingScreen from './screens/inMeetingScreen';
 import MeetingChatScreen from './screens/meetingChatScreen';
+import RegisterScreen from './screens/registerScreen';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,7 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'LOGIN', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
+        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'REGISTER', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
         <Stack.Screen name="Meeting" component={MeetingScreen} options={{ title: 'HOME', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
         <Stack.Screen name="InMeeting" component={InMeetingScreen} options={{ title: 'MEETING', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
         <Stack.Screen name="MeetingChat" component={MeetingChatScreen} options={{ title: 'MEETING CHAT', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, View, Button, StyleSheet, Text } from 'react-native';
+import { TextInput, View, Button, Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
 import {
@@ -9,8 +9,9 @@ import {
 // connect to socket server
 export const socket = io("http://192.168.1.110:3000");
 
-const MeetingScreen = ({ navigation }) => {
+const MeetingScreen = ({  route,navigation }) => {
 
+  const { username } = route.params;
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
 
@@ -72,6 +73,7 @@ const MeetingScreen = ({ navigation }) => {
             localStream: stream,
             roomID: roomID,
             peer: myPeer,
+            username: username,
           });
 
           // when participate is joinning into the room
@@ -154,6 +156,7 @@ const MeetingScreen = ({ navigation }) => {
                 roomID: meetingcode,
                 otherUserID: call.peer,
                 peer: myPeer,
+                username: username,
               });
             })
 
@@ -174,6 +177,7 @@ const MeetingScreen = ({ navigation }) => {
   return (
     <View>
       <View style={{ paddingVertical: 50, marginHorizontal: 20, }}>
+        <Text style={{fontSize: 30,fontWeight: "bold",textAlign: "center",paddingVertical: 20,}}>Welcome {username}</Text>
         <Button title="Create Meeting" onPress={createMeeting} />
         <Text>userID:{userID}</Text>
       </View>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { Text, View, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { socket } from './meetingScreen';
 
-const MeetingChatScreen = () => {
+const MeetingChatScreen = ({ route }) => {
 
+    const { username } = route.params;
     const [meetingchat, setMeetingchat] = useState([]);
     const [chat, setChat] = useState("");
 
@@ -15,7 +16,7 @@ const MeetingChatScreen = () => {
     }, [meetingchat])
 
     let submitChat = () => {
-        socket.emit('chat', chat);
+        socket.emit('chat', (username +": " + chat));
         setChat("");
     }
 
