@@ -13,7 +13,6 @@ const MeetingScreen = ({  route,navigation }) => {
 
   const { username } = route.params;
   const [meetingcode, setMeetingcode] = useState('');
-  const [userID, setUserID] = useState('');
 
   /*
     useEffect(() => {
@@ -41,10 +40,8 @@ const MeetingScreen = ({  route,navigation }) => {
     const myPeer = peerConnection();
 
     const roomID = generateRoomID();
-    setMeetingcode(roomID);
 
     myPeer.on('open', id => {
-      setUserID(id);
       socket.emit('join-room', roomID, id)
     })
 
@@ -120,7 +117,6 @@ const MeetingScreen = ({  route,navigation }) => {
     const myPeer = peerConnection();
 
     myPeer.on('open', id => {
-      setUserID(id);
       socket.emit('join-room', meetingcode, id)
     })
 
@@ -179,7 +175,6 @@ const MeetingScreen = ({  route,navigation }) => {
       <View style={{ paddingVertical: 50, marginHorizontal: 20, }}>
         <Text style={{fontSize: 30,fontWeight: "bold",textAlign: "center",paddingVertical: 20,}}>Welcome {username}</Text>
         <Button title="Create Meeting" onPress={createMeeting} />
-        <Text>userID:{userID}</Text>
       </View>
 
       <View style={{ marginHorizontal: 20, }}>
