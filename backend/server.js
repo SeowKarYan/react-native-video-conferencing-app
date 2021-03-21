@@ -11,9 +11,11 @@ io.on('connection',(socket) => {
         console.log("userID:" + userID);
         console.log("roomID:" + roomID);
 
+        let messages = [];
         socket.to(roomID).on('chat', meetingchat => {
             console.log(meetingchat);
-            io.to(roomID).emit('chat',meetingchat);
+            messages = [...messages, meetingchat];
+            io.to(roomID).emit('chat',messages);
         })
         
     })
