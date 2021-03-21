@@ -10,7 +10,16 @@ io.on('connection',(socket) => {
         socket.to(roomID).broadcast.emit('userConnected',userID)
         console.log("userID:" + userID);
         console.log("roomID:" + roomID);
+
+        let messages = [];
+        socket.to(roomID).on('chat', meetingchat => {
+            console.log(meetingchat);
+            messages = [...messages, meetingchat];
+            io.to(roomID).emit('chat',messages);
+        })
+        
     })
+
     socket.on('disconnect',() => {
         console.log('user disconnect');
     });

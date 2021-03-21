@@ -1,36 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, View, Button, StyleSheet, Text } from 'react-native';
+import { TextInput, View, Button, Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
 import {
-  RTCPeerConnection,
-  RTCIceCandidate,
-  RTCSessionDescription,
-  RTCView,
-  MediaStream,
-  MediaStreamTrack,
   mediaDevices,
-  registerGlobals
 } from 'react-native-webrtc';
 
-// connect to server
-const socket = io("http://192.168.1.102:3000");
+// connect to socket server
+export const socket = io("http://192.168.1.110:3000");
 
-const MeetingScreen = ({ navigation }) => {
+const MeetingScreen = ({  route,navigation }) => {
 
+  const { username } = route.params;
   const [meetingcode, setMeetingcode] = useState('');
   const [userID, setUserID] = useState('');
-  const [localStream, setLocalStream] = useState();
-  const [remoteStream, setRemoteStream] = useState();
+
   /*
     useEffect(() => {
-      
+     
     }, [])*/
 
   // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.102',
+      host: '192.168.1.110',
       secure: false,
       port: '3001',
       path: '/',
@@ -39,8 +32,10 @@ const MeetingScreen = ({ navigation }) => {
     return myPeer;
   }
 
+  // generate random string for room ID
   let generateRoomID = () => (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
 
+  // when host create meeting
   let createMeeting = () => {
 
     const myPeer = peerConnection();
@@ -74,33 +69,52 @@ const MeetingScreen = ({ navigation }) => {
         }
       })
         .then(stream => {
-          setLocalStream(stream);
           navigation.navigate('InMeeting', {
             localStream: stream,
-            roomID: roomID
+            roomID: roomID,
+            peer: myPeer,
+            username: username,
           });
+
+          // when participate is joinning into the room
           socket.on('userConnected', (userID) => {
+
+            // host calling the participate
             const call = myPeer.call(userID, stream);
             call.on('stream', userVideoStream => {
-              setRemoteStream(userVideoStream);
               navigation.navigate('InMeeting', {
                 remoteStream: userVideoStream,
+                otherUserID: userID
               });
             })
+
+            // get share screen stream if participate share screen
+            myPeer.on('call', call => {
+              call.answer(stream);
+              call.on('stream', userVideoStream => {
+                navigation.navigate('InMeeting', {
+                  remoteStream: userVideoStream,
+                });
+              })
+            })
+
+            // leave the meeting
             call.on('close', () => {
-              setRemoteStream(null);
               navigation.navigate('InMeeting', {
                 remoteStream: null,
               });
             })
           })
+
         })
         .catch(error => {
           console.log(error);
         });
+        
     });
   }
 
+  // When participate join into meeting room
   let joinMeeting = () => {
 
     const myPeer = peerConnection();
@@ -131,19 +145,23 @@ const MeetingScreen = ({ navigation }) => {
         }
       })
         .then(stream => {
-          setLocalStream(stream);
+
+          // participate answer the call
           myPeer.on('call', call => {
             call.answer(stream);
             call.on('stream', userVideoStream => {
-              setRemoteStream(userVideoStream);
               navigation.navigate('InMeeting', {
                 localStream: stream,
                 remoteStream: userVideoStream,
-                roomID: meetingcode
+                roomID: meetingcode,
+                otherUserID: call.peer,
+                peer: myPeer,
+                username: username,
               });
             })
+
+            // when leaving the meeting
             call.on('close', () => {
-              setRemoteStream(null);
               navigation.navigate('InMeeting', {
                 remoteStream: null,
               });
@@ -159,6 +177,7 @@ const MeetingScreen = ({ navigation }) => {
   return (
     <View>
       <View style={{ paddingVertical: 50, marginHorizontal: 20, }}>
+        <Text style={{fontSize: 30,fontWeight: "bold",textAlign: "center",paddingVertical: 20,}}>Welcome {username}</Text>
         <Button title="Create Meeting" onPress={createMeeting} />
         <Text>userID:{userID}</Text>
       </View>

@@ -1,0 +1,38 @@
+import React, { useState, useEffect } from 'react';
+import { Text, View, TextInput } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { socket } from './meetingScreen';
+
+const MeetingChatScreen = ({ route }) => {
+
+    const { username } = route.params;
+    const [meetingchat, setMeetingchat] = useState([]);
+    const [chat, setChat] = useState("");
+
+    useEffect(() => {
+        socket.on('chat', msg => {
+            setMeetingchat(msg)
+        })
+    }, [])
+
+    let submitChat = () => {
+        socket.emit('chat', (username +": " + chat));
+        setChat("");
+    }
+
+    return (
+
+        <View>
+            <View style={{ marginHorizontal: 20,marginTop: 10}}>
+            {meetingchat.map(msg => <Text key={msg}>{msg}</Text>)}
+            </View>
+            <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'center' }}>
+                <TextInput style={{ width: 300 }} placeholder="Please enter some message" onChangeText={text => setChat(text)} value={chat} onSubmitEditing={submitChat} />
+                <Icon name={`telegram`} size={30} onPress={submitChat} />
+            </View>
+        </View>
+
+    );
+}
+
+export default MeetingChatScreen;
