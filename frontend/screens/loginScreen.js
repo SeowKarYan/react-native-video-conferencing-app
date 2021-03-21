@@ -1,54 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
-//import { openDatabase } from 'react-native-sqlite-storage';
+import { openDatabase } from 'react-native-sqlite-storage';
 
 //Connction to access the pre-populated user.db
-//var db = openDatabase({ name: 'user.db', createFromLocation : 1});
+var db = openDatabase({ name: 'user.db', createFromLocation: 1 });
 
 const LoginScreen = ({ navigation }) => {
 
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-/*
+
     useEffect(() => {
         db.transaction(function (txn) {
-          txn.executeSql(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='user_table'",
-            [],
-            function (tx, res) {
-              console.log('item:', res.rows.length);
-              if (res.rows.length == 0) {
-                txn.executeSql('DROP TABLE IF EXISTS user_table', []);
-                txn.executeSql(
-                  'CREATE TABLE IF NOT EXISTS user_table(id INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(20), password VARCHAR(20), email VARCHAR(30))',
-                  []
-                );
-              }
-            }
-          );
+            txn.executeSql(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='user_table'",
+                [],
+                function (tx, res) {
+                    console.log('item:', res.rows.length);
+                    if (res.rows.length == 0) {
+                        txn.executeSql('DROP TABLE IF EXISTS user_table', []);
+                        txn.executeSql(
+                            'CREATE TABLE IF NOT EXISTS user_table(id INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(20), password VARCHAR(20), email VARCHAR(30))',
+                            []
+                        );
+                    }
+                }
+            );
         });
-      }, []);*/
+    }, []);
 
-      let login_user = () => {
+    let login_user = () => {
 
-        if (!username) {
-            alert('Please fill in your username');
+        if (!email) {
+            alert('Please fill in your email');
             return;
         }
         if (!password) {
             alert('Please fill in your password');
             return;
         }
-        navigation.navigate('Meeting',{username: username})
+        db.transaction((tx) => {
+            tx.executeSql(
+                'SELECT * FROM user_table where email = ?',
+                [email],
+                (tx, results) => {
+                    var len = results.rows.length;
+                    console.log('len', len);
+                    if (len > 0) {
+                        console.log("data:", results.rows.item(0));
+                        if (results.rows.item(0).password == password) {
+                            navigation.navigate('Meeting', { username: results.rows.item(0).username })
+                        } else {
+                            alert('Wrong Password.');
+                        }
+                    } else {
+                        alert('No user found.');
+                    }
+                }
+            );
+        });
     };
 
     return (
         <View>
             <Text style={styles.title}>Welcome</Text>
-            <Text style={styles.label}>Username:</Text>
-            <TextInput style={styles.input} placeholder="Please enter username" onChangeText={text => setUsername(text)} value={username}/>
+            <Text style={styles.label}>Email:</Text>
+            <TextInput style={styles.input} placeholder="Please enter your email" onChangeText={text => setEmail(text)} value={email} />
             <Text style={styles.label}>Password:</Text>
-            <TextInput style={styles.input} placeholder="Please enter password" onChangeText={text => setPassword(text)} value={password} secureTextEntry={true}/>
+            <TextInput style={styles.input} placeholder="Please enter your password" onChangeText={text => setPassword(text)} value={password} secureTextEntry={true} />
             <View style={{ paddingTop: 20, marginHorizontal: 20, }}>
                 <Button title="Login" onPress={login_user} />
             </View>
