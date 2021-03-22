@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextInput, View, Button, Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   mediaDevices,
 } from 'react-native-webrtc';
@@ -9,7 +10,7 @@ import {
 // connect to socket server
 export const socket = io("http://192.168.1.110:3000");
 
-const MeetingScreen = ({  route,navigation }) => {
+const MeetingScreen = ({ route, navigation }) => {
 
   const { username } = route.params;
   const [meetingcode, setMeetingcode] = useState('');
@@ -107,7 +108,7 @@ const MeetingScreen = ({  route,navigation }) => {
         .catch(error => {
           console.log(error);
         });
-        
+
     });
   }
 
@@ -172,8 +173,11 @@ const MeetingScreen = ({  route,navigation }) => {
 
   return (
     <View>
+      <View style={{ paddingTop: 20, paddingRight: 20 }}>
+        <Icon style={{ textAlign: "right" }} name={'notebook'} size={30} />
+      </View>
       <View style={{ paddingVertical: 50, marginHorizontal: 20, }}>
-        <Text style={{fontSize: 30,fontWeight: "bold",textAlign: "center",paddingVertical: 20,}}>Welcome {username}</Text>
+        <Text style={{ fontSize: 30, fontWeight: "bold", textAlign: "center", paddingVertical: 20, }}>Welcome {username}</Text>
         <Button title="Create Meeting" onPress={createMeeting} />
       </View>
 
@@ -181,6 +185,7 @@ const MeetingScreen = ({  route,navigation }) => {
         <TextInput style={{ paddingBottom: 20 }} placeholder="Please enter meeting code" onChangeText={text => setMeetingcode(text)} value={meetingcode} />
         <Button title="Join Meeting" onPress={joinMeeting} />
       </View>
+
 
     </View>
 
