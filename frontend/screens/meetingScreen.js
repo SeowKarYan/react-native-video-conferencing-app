@@ -12,7 +12,7 @@ export const socket = io("http://192.168.1.110:3000");
 
 const MeetingScreen = ({ route, navigation }) => {
 
-  const { username } = route.params;
+  const { username, user_id } = route.params;
   const [meetingcode, setMeetingcode] = useState('');
 
   /*
@@ -72,6 +72,7 @@ const MeetingScreen = ({ route, navigation }) => {
             roomID: roomID,
             peer: myPeer,
             username: username,
+            user_id: user_id,
           });
 
           // when participate is joinning into the room
@@ -154,6 +155,7 @@ const MeetingScreen = ({ route, navigation }) => {
                 otherUserID: call.peer,
                 peer: myPeer,
                 username: username,
+                user_id: user_id,
               });
             })
 
@@ -174,7 +176,7 @@ const MeetingScreen = ({ route, navigation }) => {
   return (
     <View>
       <View style={{ paddingTop: 20, paddingRight: 20 }}>
-        <Icon style={{ textAlign: "right" }} name={'notebook'} size={30} />
+        <Icon style={{ textAlign: "right" }} name={'notebook'} size={30} onPress={() => navigation.navigate('ViewMeetingNote', {user_id: user_id})}/>
       </View>
       <View style={{ paddingVertical: 50, marginHorizontal: 20, }}>
         <Text style={{ fontSize: 30, fontWeight: "bold", textAlign: "center", paddingVertical: 20, }}>Welcome {username}</Text>

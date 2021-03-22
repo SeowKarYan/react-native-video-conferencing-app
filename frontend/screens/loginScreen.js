@@ -16,11 +16,27 @@ const LoginScreen = ({ navigation }) => {
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='user_table'",
                 [],
                 function (tx, res) {
-                    console.log('item:', res.rows.length);
+                    console.log('user table:', res.rows.length);
                     if (res.rows.length == 0) {
                         txn.executeSql('DROP TABLE IF EXISTS user_table', []);
                         txn.executeSql(
                             'CREATE TABLE IF NOT EXISTS user_table(id INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(20), password VARCHAR(20), email VARCHAR(30))',
+                            []
+                        );
+                    }
+                }
+            );
+        });
+        db.transaction(function (txn) {
+            txn.executeSql(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='note_table'",
+                [],
+                function (tx, res) {
+                    console.log('note table:', res.rows.length);
+                    if (res.rows.length == 0) {
+                        txn.executeSql('DROP TABLE IF EXISTS note_table', []);
+                        txn.executeSql(
+                            'CREATE TABLE IF NOT EXISTS note_table(note_id INTEGER PRIMARY KEY AUTOINCREMENT, title VARCHAR(50), description VARCHAR(200), user_id INTEGER(5))',
                             []
                         );
                     }
@@ -50,11 +66,11 @@ const LoginScreen = ({ navigation }) => {
                 [email],
                 (tx, results) => {
                     var len = results.rows.length;
-                    console.log('len', len);
+                    console.log('login email', len);
                     if (len > 0) {
                         console.log("data:", results.rows.item(0));
                         if (results.rows.item(0).password == password) {
-                            navigation.navigate('Meeting', { username: results.rows.item(0).username })
+                            navigation.navigate('Meeting', { username: results.rows.item(0).username, user_id: results.rows.item(0).id })
                         } else {
                             alert('Wrong Password.');
                         }

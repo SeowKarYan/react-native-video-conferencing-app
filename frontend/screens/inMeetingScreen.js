@@ -9,23 +9,31 @@ import {
   mediaDevices,
 } from 'react-native-webrtc';
 import { socket } from './meetingScreen';
+import { openDatabase } from 'react-native-sqlite-storage';
+
+//Connction to access the pre-populated user_db.sqlite
+var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID, otherUserID, peer, username } = route.params;
+  const { localStream, remoteStream, roomID, otherUserID, peer, username,user_id } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
   const [otherStream, setOtherStream] = useState();
   const [myStream, setMyStream] = useState();
   const [myPeer, setMyPeer] = useState();
-  const [note, setNote] = useState("");
-  const [noteTitle, setNoteTitle] = useState("");
+  const [note, setNote] = useState('');
+  const [noteTitle, setNoteTitle] = useState('');
   const [meetingchat, setMeetingchat] = useState([]);
-  const [chat, setChat] = useState("");
+  const [chat, setChat] = useState('');
 
   useEffect(() => {
     setMyStream(localStream);
     setMyPeer(peer);
+    var date = new Date().getDate(); //To get the Current Date
+    var month = new Date().getMonth() + 1; //To get the Current Month
+    var year = new Date().getFullYear(); //To get the Current Year  
+    setNoteTitle("Meeting Note(" + date + "/" + month + "/" + year + ")");
   }, [])
 
   useEffect(() => {
@@ -126,7 +134,22 @@ const InMeetingScreen = ({ route, navigation }) => {
   }
 
   let endMeeting = () => {
-    navigation.navigate('Meeting');
+    if(!note){
+      navigation.navigate('Meeting');
+    }else{
+      db.transaction(function (tx) {
+        tx.executeSql(
+          'INSERT INTO note_table (title, description, user_id) VALUES (?,?,?)',
+          [noteTitle, note, user_id],
+          (tx, results) => {
+            console.log('Insert note', results.rowsAffected);
+            if (results.rowsAffected > 0) {
+              navigation.navigate('Meeting');
+            } else alert('Add Meeting Note Failed');
+          }
+        );
+      });
+    }
   }
 
   return (
@@ -137,7 +160,7 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={`${mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic} />
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
-        <Icons color="red" style={{ paddingLeft: 70 }} name={'call-end'} size={30} onPress={endMeeting}/>
+        <Icons color="red" style={{ paddingLeft: 70 }} name={'call-end'} size={30} onPress={endMeeting} />
       </View>
       <Text style={{ paddingVertical: 10, fontWeight: "bold", textAlign: "center" }}>Room ID: {roomID}</Text>
       <View style={{ flexDirection: 'row', }}>
@@ -163,7 +186,9 @@ const InMeetingScreen = ({ route, navigation }) => {
         <View style={{ height: "100%", borderWidth: 1 }}></View>
         <View style={{ width: 190 }}>
           <Text style={{ fontWeight: "bold", textAlign: "center" }}>Meeting Note</Text>
+          <Text style={{ paddingLeft: 5 }}>Title:</Text>
           <TextInput placeholder="Please enter note title" onChangeText={text => setNoteTitle(text)} value={noteTitle} />
+          <Text style={{ paddingLeft: 5 }}>Description:</Text>
           <TextInput multiline placeholder="Please enter your note here" onChangeText={text => setNote(text)} value={note} />
         </View>
       </View>

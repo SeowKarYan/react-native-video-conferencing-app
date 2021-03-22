@@ -46,7 +46,7 @@ const RegisterScreen = ({ navigation }) => {
         'INSERT INTO user_table (username, password, email) VALUES (?,?,?)',
         [username, password, email],
         (tx, results) => {
-          console.log('Results', results.rowsAffected);
+          console.log('Insert user', results.rowsAffected);
           if (results.rowsAffected > 0) {
             Alert.alert(
               'Success',
