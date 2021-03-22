@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
 
-//Connction to access the pre-populated user.db
-var db = openDatabase({ name: 'user.db', createFromLocation: 1 });
+//Connction to access the pre-populated user_db.sqlite
+var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
 const LoginScreen = ({ navigation }) => {
 
@@ -35,6 +35,11 @@ const LoginScreen = ({ navigation }) => {
             alert('Please fill in your email');
             return;
         }
+        const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (reg.test(email) === false) {
+            alert('Please fill in a valid email.');
+            return;
+        }
         if (!password) {
             alert('Please fill in your password');
             return;
@@ -54,7 +59,7 @@ const LoginScreen = ({ navigation }) => {
                             alert('Wrong Password.');
                         }
                     } else {
-                        alert('No user found.');
+                        alert('Please register an account before you login.');
                     }
                 }
             );

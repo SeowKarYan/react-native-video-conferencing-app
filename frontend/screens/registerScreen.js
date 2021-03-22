@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Text, View, Button, TextInput, Alert, } from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
 
-//Connction to access the pre-populated user.db
-var db = openDatabase({ name: 'user.db', createFromLocation: 1 });
+//Connction to access the pre-populated user_db.sqlite
+var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
 const RegisterScreen = ({ navigation }) => {
 
