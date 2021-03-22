@@ -11,9 +11,9 @@ const MeetingChatScreen = ({ route }) => {
 
     useEffect(() => {
         socket.on('chat', msg => {
-            setMeetingchat(msg)
+            setMeetingchat([...meetingchat,msg])
         })
-    }, [])
+    }, [meetingchat])
 
     let submitChat = () => {
         socket.emit('chat', (username +": " + chat));
