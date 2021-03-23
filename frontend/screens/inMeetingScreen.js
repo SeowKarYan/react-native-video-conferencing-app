@@ -1,30 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, } from 'react-native';
+import { Text, View, ScrollView, TextInput, } from 'react-native';
 //import Peer from 'react-native-peerjs';
+import Icons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import VIForegroundService from '@voximplant/react-native-foreground-service';
 import {
   RTCView,
   mediaDevices,
 } from 'react-native-webrtc';
+import { socket } from './meetingScreen';
+import { openDatabase } from 'react-native-sqlite-storage';
+
+//Connction to access the pre-populated user_db.sqlite
+var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID, otherUserID, peer, username } = route.params;
+  const { localStream, remoteStream, roomID, otherUserID, peer, username, user_id } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
   const [otherStream, setOtherStream] = useState();
   const [myStream, setMyStream] = useState();
   const [myPeer, setMyPeer] = useState();
+  const [note, setNote] = useState('');
+  const [noteTitle, setNoteTitle] = useState('');
+  const [meetingchat, setMeetingchat] = useState([]);
+  const [chat, setChat] = useState('');
 
   useEffect(() => {
     setMyStream(localStream);
     setMyPeer(peer);
+    var date = new Date().getDate(); //To get the Current Date
+    var month = new Date().getMonth() + 1; //To get the Current Month
+    var year = new Date().getFullYear(); //To get the Current Year  
+    setNoteTitle("Meeting Note(" + date + "/" + month + "/" + year + ")");
   }, [])
 
   useEffect(() => {
     setOtherStream(remoteStream);
   }, [remoteStream])
+
+  useEffect(() => {
+    socket.on('chat', msg => {
+      setMeetingchat([...meetingchat, msg])
+    })
+  }, [meetingchat])
 
   // connect to peer server
   /*
@@ -108,28 +128,73 @@ const InMeetingScreen = ({ route, navigation }) => {
     await VIForegroundService.stopService();
   }
 
+  let submitChat = () => {
+    socket.emit('chat', (username + ": " + chat));
+    setChat("");
+  }
+
+  let endMeeting = () => {
+    if (!note) {
+      navigation.navigate('Meeting');
+    } else {
+      db.transaction(function (tx) {
+        tx.executeSql(
+          'INSERT INTO note_table (title, description, user_id) VALUES (?,?,?)',
+          [noteTitle, note, user_id],
+          (tx, results) => {
+            console.log('Insert note', results.rowsAffected);
+            if (results.rowsAffected > 0) {
+              alert('Your meeting note have successfully saved.');
+              navigation.navigate('Meeting');
+            } else alert('Your meeting note failed to save.');
+          }
+        );
+      });
+    }
+  }
+
   return (
-    <View>
-      <View>
-        <Text style={{ paddingHorizontal: 90, paddingVertical: 10 }}>Room ID: {roomID}</Text>
-        <View style={{ flexDirection: 'row', }}>
-          {myStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
-            streamURL={myStream.toURL()}
-          />}
-          {otherStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
-            streamURL={otherStream.toURL()}
-          />}
-        </View>
-      </View>
+
+    <ScrollView>
       <View style={{ marginHorizontal: 20, marginTop: 10, flexDirection: 'row', justifyContent: 'center' }}>
         <Icon style={{ paddingHorizontal: 5 }} name={`${camera && 'camera' || 'camera-off'}`} size={30} onPress={turnCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic} />
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
-        <Icon style={{ paddingHorizontal: 5 }} name={`comment-text-multiple`} size={30} onPress={() => navigation.navigate('MeetingChat',{username: username})} />
-        <Icon style={{ paddingHorizontal: 5 }} name={`notebook`} size={30} onPress={() => navigation.navigate('MeetingNote')} />
+        <Icons color="red" style={{ paddingLeft: 70 }} name={'call-end'} size={30} onPress={endMeeting} />
       </View>
-    </View>
+      <Text style={{ paddingVertical: 10, fontWeight: "bold", textAlign: "center" }}>Room ID: {roomID}</Text>
+      <View style={{ flexDirection: 'row', }}>
+        {myStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
+          streamURL={myStream.toURL()}
+        />}
+        {otherStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
+          streamURL={otherStream.toURL()}
+        />}
+      </View>
+
+      <View style={{ marginHorizontal: 10, marginTop: 10, flexDirection: 'row' }}>
+        <View style={{ width: 190 }}>
+          <Text style={{ fontWeight: "bold", textAlign: "center" }}>Meeting Chat</Text>
+          <View style={{ marginTop: 10 }}>
+            {meetingchat.map(msg => <Text key={msg}>{msg}</Text>)}
+          </View>
+          <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'center' }}>
+            <TextInput style={{ width: 130 }} placeholder="messages..." onChangeText={text => setChat(text)} value={chat} onSubmitEditing={submitChat} />
+            <Icon name={`telegram`} size={30} onPress={submitChat} />
+          </View>
+        </View>
+        <View style={{ height: "100%", borderWidth: 1 }}></View>
+        <View style={{ width: 190 }}>
+          <Text style={{ fontWeight: "bold", textAlign: "center" }}>Meeting Note</Text>
+          <Text style={{ paddingLeft: 5 }}>Title:</Text>
+          <TextInput placeholder="Please enter note title" onChangeText={text => setNoteTitle(text)} value={noteTitle} />
+          <Text style={{ paddingLeft: 5 }}>Description:</Text>
+          <TextInput multiline placeholder="Please enter your note here" onChangeText={text => setNote(text)} value={note} />
+        </View>
+      </View>
+    </ScrollView>
+
 
   );
 }

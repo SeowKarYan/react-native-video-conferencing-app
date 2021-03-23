@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextInput, View, Button, Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   mediaDevices,
 } from 'react-native-webrtc';
@@ -9,11 +10,10 @@ import {
 // connect to socket server
 export const socket = io("http://192.168.1.110:3000");
 
-const MeetingScreen = ({  route,navigation }) => {
+const MeetingScreen = ({ route, navigation }) => {
 
-  const { username } = route.params;
+  const { username, user_id } = route.params;
   const [meetingcode, setMeetingcode] = useState('');
-  const [userID, setUserID] = useState('');
 
   /*
     useEffect(() => {
@@ -41,10 +41,8 @@ const MeetingScreen = ({  route,navigation }) => {
     const myPeer = peerConnection();
 
     const roomID = generateRoomID();
-    setMeetingcode(roomID);
 
     myPeer.on('open', id => {
-      setUserID(id);
       socket.emit('join-room', roomID, id)
     })
 
@@ -74,6 +72,7 @@ const MeetingScreen = ({  route,navigation }) => {
             roomID: roomID,
             peer: myPeer,
             username: username,
+            user_id: user_id,
           });
 
           // when participate is joinning into the room
@@ -110,7 +109,7 @@ const MeetingScreen = ({  route,navigation }) => {
         .catch(error => {
           console.log(error);
         });
-        
+
     });
   }
 
@@ -120,7 +119,6 @@ const MeetingScreen = ({  route,navigation }) => {
     const myPeer = peerConnection();
 
     myPeer.on('open', id => {
-      setUserID(id);
       socket.emit('join-room', meetingcode, id)
     })
 
@@ -157,6 +155,7 @@ const MeetingScreen = ({  route,navigation }) => {
                 otherUserID: call.peer,
                 peer: myPeer,
                 username: username,
+                user_id: user_id,
               });
             })
 
@@ -176,16 +175,19 @@ const MeetingScreen = ({  route,navigation }) => {
 
   return (
     <View>
+      <View style={{ paddingTop: 20, paddingRight: 20 }}>
+        <Icon style={{ textAlign: "right" }} name={'notebook'} size={30} onPress={() => navigation.navigate('ViewMeetingNote', {user_id: user_id})}/>
+      </View>
       <View style={{ paddingVertical: 50, marginHorizontal: 20, }}>
-        <Text style={{fontSize: 30,fontWeight: "bold",textAlign: "center",paddingVertical: 20,}}>Welcome {username}</Text>
+        <Text style={{ fontSize: 30, fontWeight: "bold", textAlign: "center", paddingVertical: 20, }}>Welcome {username}</Text>
         <Button title="Create Meeting" onPress={createMeeting} />
-        <Text>userID:{userID}</Text>
       </View>
 
       <View style={{ marginHorizontal: 20, }}>
         <TextInput style={{ paddingBottom: 20 }} placeholder="Please enter meeting code" onChangeText={text => setMeetingcode(text)} value={meetingcode} />
         <Button title="Join Meeting" onPress={joinMeeting} />
       </View>
+
 
     </View>
 
