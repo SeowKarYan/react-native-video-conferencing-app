@@ -23,7 +23,7 @@ const App = () => {
         <Stack.Screen name="Meeting" component={MeetingScreen} options={{ title: 'HOME', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
         <Stack.Screen name="InMeeting" component={InMeetingScreen} options={{ title: 'MEETING', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
         <Stack.Screen name="ViewMeetingNote" component={ViewMeetingNoteScreen} options={{ title: 'MEETING NOTE', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
-        <Stack.Screen name="EditMeetingNote" component={EditMeetingNoteScreen} options={{ title: 'MEETING NOTE', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
+        <Stack.Screen name="EditMeetingNote" component={EditMeetingNoteScreen} options={{ title: 'EDIT MEETING NOTE', headerStyle: { backgroundColor: '#3949AB' }, headerTintColor: 'white' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

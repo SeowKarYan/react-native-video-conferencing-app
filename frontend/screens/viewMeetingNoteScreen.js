@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, SafeAreaView } from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import EditMeetingNote from './editMeetingNoteScreen';
 
 //Connction to access the pre-populated user_db.sqlite
 var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
@@ -43,8 +42,8 @@ const ViewMeetingNoteScreen = ({ route, navigation }) => {
                 key={item.note_id}
                 style={{ backgroundColor: 'white', padding: 20 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                    <Icon style={{ paddingHorizontal: 5 }} name={'edit'} size={30} onPress={() => navigation.navigate('EditMeetingNote', {note_id:item.note_id})}/>
-                    <Icon style={{ paddingHorizontal: 5 }} name={'delete'} size={30} onPress={() => deleteNote(item.note_id)}/>
+                    <Icon style={{ paddingHorizontal: 5 }} name={'edit'} size={30} onPress={() => navigation.navigate('EditMeetingNote', {note_id:item.note_id,title:item.title,description:item.description})}/>
+                    <Icon color="red" style={{ paddingHorizontal: 5 }} name={'delete'} size={30} onPress={() => deleteNote(item.note_id)}/>
                 </View>
                 <Text>Title: {item.title}</Text>
                 <Text>Description: {item.description}</Text>
