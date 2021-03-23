@@ -18,14 +18,14 @@ const EditMeetingNote = ({ route, navigation }) => {
     }, [])
 
     let updateNote = () => {
-        console.log("Update note",note_id,noteTitle,noteDescription,user_id);
+        console.log("Update note details",note_id,noteTitle,noteDescription,user_id);
 
         db.transaction((tx) => {
             tx.executeSql(
                 'UPDATE note_table set title=?, description=?,user_id=? where note_id=?',
                 [noteTitle, noteDescription, user_id, note_id],
                 (tx, results) => {
-                    console.log('Update note', results.rowsAffected);
+                    console.log('Number of row affected for update note', results.rowsAffected);
                     if (results.rowsAffected > 0) {
                         Alert.alert(
                             'Success',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, SafeAreaView } from 'react-native';
+import { Text, View, FlatList, SafeAreaView, Alert } from 'react-native';
 import { openDatabase } from 'react-native-sqlite-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -33,7 +33,32 @@ const ViewMeetingNoteScreen = ({ route, navigation }) => {
     };
 
     let deleteNote = (note_id) => {
-        console.log("delete note: " + note_id);
+        console.log("delete note id: " + note_id);
+
+        db.transaction(tx => {
+            tx.executeSql(
+              'DELETE FROM note_table where note_id=?',
+              [note_id],
+              (tx, results) => {
+                console.log('Number of row affected for delete note', results.rowsAffected);
+                if (results.rowsAffected > 0) {
+                  Alert.alert(
+                    'Success',
+                    'Meeting note deleted successfully',
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => navigation.navigate('Meeting'),
+                      },
+                    ],
+                    { cancelable: false }
+                  );
+                } else {
+                  alert('Meeting note failed to delete.');
+                }
+              }
+            );
+          });
     }
 
     let listItemView = (item) => {
