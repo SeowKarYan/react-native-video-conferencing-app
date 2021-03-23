@@ -15,7 +15,7 @@ import { openDatabase } from 'react-native-sqlite-storage';
 var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID, otherUserID, peer, username,user_id } = route.params;
+  const { localStream, remoteStream, roomID, otherUserID, peer, username, user_id } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
@@ -134,9 +134,9 @@ const InMeetingScreen = ({ route, navigation }) => {
   }
 
   let endMeeting = () => {
-    if(!note){
+    if (!note) {
       navigation.navigate('Meeting');
-    }else{
+    } else {
       db.transaction(function (tx) {
         tx.executeSql(
           'INSERT INTO note_table (title, description, user_id) VALUES (?,?,?)',
@@ -144,8 +144,9 @@ const InMeetingScreen = ({ route, navigation }) => {
           (tx, results) => {
             console.log('Insert note', results.rowsAffected);
             if (results.rowsAffected > 0) {
+              alert('Your meeting note have successfully saved.');
               navigation.navigate('Meeting');
-            } else alert('Add Meeting Note Failed');
+            } else alert('Your meeting note failed to save.');
           }
         );
       });
