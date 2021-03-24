@@ -8,7 +8,7 @@ import {
 } from 'react-native-webrtc';
 
 // connect to socket server
-export const socket = io("http://192.168.1.110:3000");
+export const socket = io("http://192.168.1.106:3000");
 
 const MeetingScreen = ({ route, navigation }) => {
 
@@ -23,7 +23,7 @@ const MeetingScreen = ({ route, navigation }) => {
   // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.110',
+      host: '192.168.1.106',
       secure: false,
       port: '3001',
       path: '/',
