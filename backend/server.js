@@ -13,7 +13,7 @@ io.on('connection',(socket) => {
 
         socket.to(roomID).on('chat', meetingchat => {
             console.log(meetingchat);
-            io.to(roomID).emit('chat',meetingchat);
+            io.to(roomID).emit('emitchat',meetingchat);
         })
         
     })

@@ -52,9 +52,10 @@ const InMeetingScreen = ({ route, navigation }) => {
   }, [remoteStream])
 
   useEffect(() => {
-    socket.on('chat', msg => {
+    socket.on('emitchat', msg => {
       setMeetingchat([...meetingchat, msg])
     })
+   
   }, [meetingchat])
 
   // connect to peer server
@@ -108,6 +109,10 @@ const InMeetingScreen = ({ route, navigation }) => {
         console.log(error);
       })
 
+      socket.on('emitchat', msg => {
+          pushMeetingChat("Meeting Chat",msg);
+      })
+
     } else {
       setScreen(!screen);
       setMyStream(localStream);
@@ -116,12 +121,12 @@ const InMeetingScreen = ({ route, navigation }) => {
     }
   }
 
-  let pushMeetingChat = () => {
+  let pushMeetingChat = (title, message) => {
 
     PushNotification.localNotification({
       channelId: "channel-id",
-      title: "My Notification Title",
-      message: "My Notification Message",
+      title: title,
+      message: message,
     });
   }
 
@@ -244,7 +249,6 @@ const InMeetingScreen = ({ route, navigation }) => {
           streamURL={otherStream.toURL()}
         />}
       </View>
-      <Button title="push notification" onPress={pushMeetingChat} />
     </ScrollView>
 
 
