@@ -10,6 +10,7 @@ import {
 } from 'react-native-webrtc';
 import { socket } from './meetingScreen';
 import { openDatabase } from 'react-native-sqlite-storage';
+import PushNotification from "react-native-push-notification";
 
 //Connction to access the pre-populated user_db.sqlite
 var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
@@ -36,6 +37,14 @@ const InMeetingScreen = ({ route, navigation }) => {
     var month = new Date().getMonth() + 1; //To get the Current Month
     var year = new Date().getFullYear(); //To get the Current Year  
     setNoteTitle("Meeting Note(" + date + "/" + month + "/" + year + ")");
+    
+    PushNotification.createChannel(
+      {
+        channelId: "channel-id",
+        channelName: "My channel",
+        channelDescription: "A channel to categorise your notifications",
+      },
+    );
   }, [])
 
   useEffect(() => {
@@ -105,6 +114,15 @@ const InMeetingScreen = ({ route, navigation }) => {
       stopService();
       myPeer.call(otherUserID, localStream);
     }
+  }
+
+  let pushMeetingChat = () => {
+
+    PushNotification.localNotification({
+      channelId: "channel-id",
+      title: "My Notification Title",
+      message: "My Notification Message",
+    });
   }
 
   async function startService() {
@@ -226,6 +244,7 @@ const InMeetingScreen = ({ route, navigation }) => {
           streamURL={otherStream.toURL()}
         />}
       </View>
+      <Button title="push notification" onPress={pushMeetingChat} />
     </ScrollView>
 
 
