@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, ScrollView, TextInput, } from 'react-native';
+import { Text, View, ScrollView, TextInput, Modal, Button } from 'react-native';
 //import Peer from 'react-native-peerjs';
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,6 +26,8 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [noteTitle, setNoteTitle] = useState('');
   const [meetingchat, setMeetingchat] = useState([]);
   const [chat, setChat] = useState('');
+  const [chatModal, setChatModal] = useState(false);
+  const [noteModal, setNoteModal] = useState(false);
 
   useEffect(() => {
     setMyStream(localStream);
@@ -161,8 +163,60 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={`${mic && 'microphone' || 'microphone-off'}`} size={30} onPress={turnMic} />
         <Icon style={{ paddingHorizontal: 5 }} name={'camera-switch'} size={30} onPress={switchCamera} />
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
-        <Icons color="red" style={{ paddingLeft: 70 }} name={'call-end'} size={30} onPress={endMeeting} />
+        <Icon style={{ paddingHorizontal: 5 }} name={'comment-text-multiple'} size={30} onPress={() => setChatModal(true)} />
+        <Icon style={{ paddingHorizontal: 5 }} name={'notebook'} size={30} onPress={() => setNoteModal(true)} />
+        <Icons color="red" style={{ paddingLeft: 60 }} name={'call-end'} size={30} onPress={endMeeting} />
       </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={chatModal}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setChatModal(!chatModal);
+        }}
+      >
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
+          <View style={{ backgroundColor: "white" }}>
+            <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Meeting Chat</Text>
+            <View style={{ marginTop: 10, paddingHorizontal: 10 }}>
+              {meetingchat.map(msg => <Text key={msg}>{msg}</Text>)}
+            </View>
+            <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'center', paddingHorizontal: 10 }}>
+              <TextInput style={{ width: 200 }} placeholder="messages..." onChangeText={text => setChat(text)} value={chat} onSubmitEditing={submitChat} />
+              <Icon name={`telegram`} size={30} onPress={submitChat} />
+            </View>
+            <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
+              <Button title="Close" onPress={() => setChatModal(!chatModal)} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={noteModal}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setNoteModal(!noteModal);
+        }}
+      >
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
+          <View style={{ backgroundColor: "white", width: 250 }}>
+            <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Meeting Note</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Title:</Text>
+            <TextInput placeholder="Please enter note title" onChangeText={text => setNoteTitle(text)} value={noteTitle} />
+            <Text style={{ paddingLeft: 10 }}>Description:</Text>
+            <TextInput multiline placeholder="Please enter your note here" onChangeText={text => setNote(text)} value={note} />
+            <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
+              <Button title="Close" onPress={() => setNoteModal(!noteModal)} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <Text style={{ paddingVertical: 10, fontWeight: "bold", textAlign: "center" }}>Room ID: {roomID}</Text>
       <View style={{ flexDirection: 'row', }}>
         {myStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
@@ -171,27 +225,6 @@ const InMeetingScreen = ({ route, navigation }) => {
         {otherStream && <RTCView style={{ width: 200, height: 200, borderColor: "red", backgroundColor: "black" }}
           streamURL={otherStream.toURL()}
         />}
-      </View>
-
-      <View style={{ marginHorizontal: 10, marginTop: 10, flexDirection: 'row' }}>
-        <View style={{ width: 190 }}>
-          <Text style={{ fontWeight: "bold", textAlign: "center" }}>Meeting Chat</Text>
-          <View style={{ marginTop: 10 }}>
-            {meetingchat.map(msg => <Text key={msg}>{msg}</Text>)}
-          </View>
-          <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'center' }}>
-            <TextInput style={{ width: 130 }} placeholder="messages..." onChangeText={text => setChat(text)} value={chat} onSubmitEditing={submitChat} />
-            <Icon name={`telegram`} size={30} onPress={submitChat} />
-          </View>
-        </View>
-        <View style={{ height: "100%", borderWidth: 1 }}></View>
-        <View style={{ width: 190 }}>
-          <Text style={{ fontWeight: "bold", textAlign: "center" }}>Meeting Note</Text>
-          <Text style={{ paddingLeft: 5 }}>Title:</Text>
-          <TextInput placeholder="Please enter note title" onChangeText={text => setNoteTitle(text)} value={noteTitle} />
-          <Text style={{ paddingLeft: 5 }}>Description:</Text>
-          <TextInput multiline placeholder="Please enter your note here" onChangeText={text => setNote(text)} value={note} />
-        </View>
       </View>
     </ScrollView>
 
