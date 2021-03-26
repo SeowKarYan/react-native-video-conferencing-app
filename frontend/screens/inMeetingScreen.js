@@ -10,12 +10,13 @@ import {
 } from 'react-native-webrtc';
 import { socket } from './meetingScreen';
 import { openDatabase } from 'react-native-sqlite-storage';
+import PushNotification from "react-native-push-notification";
 
 //Connction to access the pre-populated user_db.sqlite
 var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID, otherUserID, peer, username, user_id } = route.params;
+  const { localStream, remoteStream, roomID, otherUserID, peer, username, user_id, myuserID } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
@@ -36,6 +37,14 @@ const InMeetingScreen = ({ route, navigation }) => {
     var month = new Date().getMonth() + 1; //To get the Current Month
     var year = new Date().getFullYear(); //To get the Current Year  
     setNoteTitle("Meeting Note(" + date + "/" + month + "/" + year + ")");
+    
+    PushNotification.createChannel(
+      {
+        channelId: "channel-id",
+        channelName: "My channel",
+        channelDescription: "A channel to categorise your notifications",
+      },
+    );
   }, [])
 
   useEffect(() => {
@@ -43,9 +52,10 @@ const InMeetingScreen = ({ route, navigation }) => {
   }, [remoteStream])
 
   useEffect(() => {
-    socket.on('chat', msg => {
+    socket.on('emitchat', msg => {
       setMeetingchat([...meetingchat, msg])
     })
+   
   }, [meetingchat])
 
   // connect to peer server
@@ -99,12 +109,25 @@ const InMeetingScreen = ({ route, navigation }) => {
         console.log(error);
       })
 
+      socket.on('emitchat', msg => {
+          pushMeetingChat("Meeting Chat",msg);
+      })
+
     } else {
       setScreen(!screen);
       setMyStream(localStream);
       stopService();
       myPeer.call(otherUserID, localStream);
     }
+  }
+
+  let pushMeetingChat = (title, message) => {
+
+    PushNotification.localNotification({
+      channelId: "channel-id",
+      title: title,
+      message: message,
+    });
   }
 
   async function startService() {
@@ -136,6 +159,9 @@ const InMeetingScreen = ({ route, navigation }) => {
   }
 
   let endMeeting = () => {
+
+    socket.emit('leave-room', roomID, myuserID);
+
     if (!note) {
       navigation.navigate('Meeting');
     } else {
