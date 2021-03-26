@@ -4,18 +4,25 @@ const io = require('socket.io')(http);
 
 io.on('connection',(socket) => {
     console.log('user connected');
-    
+
     socket.on('join-room',(roomID,userID)=>{
         socket.join(roomID)
         socket.to(roomID).broadcast.emit('userConnected',userID)
-        console.log("userID:" + userID);
-        console.log("roomID:" + roomID);
+        console.log("userID: " + userID);
+        console.log("roomID: " + roomID);
+        console.log("number of participant:" );
 
         socket.to(roomID).on('chat', meetingchat => {
             console.log(meetingchat);
             io.to(roomID).emit('emitchat',meetingchat);
         })
         
+    })
+
+    socket.on('leave-room', (roomID,userID)=> {
+        socket.leave(roomID)
+        socket.to(roomID).broadcast.emit('userDisconnected',userID)
+        console.log("leave meeting: " + userID);
     })
 
     socket.on('disconnect',() => {

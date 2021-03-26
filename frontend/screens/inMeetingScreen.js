@@ -16,7 +16,7 @@ import PushNotification from "react-native-push-notification";
 var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
 const InMeetingScreen = ({ route, navigation }) => {
-  const { localStream, remoteStream, roomID, otherUserID, peer, username, user_id } = route.params;
+  const { localStream, remoteStream, roomID, otherUserID, peer, username, user_id, myuserID } = route.params;
   const [camera, setCamera] = useState(true);
   const [mic, setMic] = useState(true);
   const [screen, setScreen] = useState(false);
@@ -159,6 +159,9 @@ const InMeetingScreen = ({ route, navigation }) => {
   }
 
   let endMeeting = () => {
+
+    socket.emit('leave-room', roomID, myuserID);
+
     if (!note) {
       navigation.navigate('Meeting');
     } else {

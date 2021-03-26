@@ -8,7 +8,7 @@ import {
 } from 'react-native-webrtc';
 
 // connect to socket server
-export const socket = io("http://192.168.1.106:3000");
+export const socket = io("http://192.168.1.110:3000");
 
 const MeetingScreen = ({ route, navigation }) => {
 
@@ -23,7 +23,7 @@ const MeetingScreen = ({ route, navigation }) => {
   // connect to peer server
   let peerConnection = () => {
     const myPeer = new Peer(undefined, {
-      host: '192.168.1.106',
+      host: '192.168.1.110',
       secure: false,
       port: '3001',
       path: '/',
@@ -41,9 +41,11 @@ const MeetingScreen = ({ route, navigation }) => {
     const myPeer = peerConnection();
 
     const roomID = generateRoomID();
+    let myuserID = "";
 
     myPeer.on('open', id => {
       socket.emit('join-room', roomID, id)
+      myuserID = id;
     })
 
     let isFront = true;
@@ -73,6 +75,7 @@ const MeetingScreen = ({ route, navigation }) => {
             peer: myPeer,
             username: username,
             user_id: user_id,
+            myuserID: myuserID,
           });
 
           // when participate is joinning into the room
@@ -98,7 +101,8 @@ const MeetingScreen = ({ route, navigation }) => {
             })
 
             // leave the meeting
-            call.on('close', () => {
+            socket.on('userDisconnected',userID => {
+              console.log("leave meeting:" + userID);
               navigation.navigate('InMeeting', {
                 remoteStream: null,
               });
@@ -117,9 +121,11 @@ const MeetingScreen = ({ route, navigation }) => {
   let joinMeeting = () => {
 
     const myPeer = peerConnection();
+    let myuserID = "";
 
     myPeer.on('open', id => {
       socket.emit('join-room', meetingcode, id)
+      myuserID = id;
     })
 
     let isFront = true;
@@ -156,11 +162,13 @@ const MeetingScreen = ({ route, navigation }) => {
                 peer: myPeer,
                 username: username,
                 user_id: user_id,
+                myuserID: myuserID,
               });
             })
 
-            // when leaving the meeting
-            call.on('close', () => {
+            // leave the meeting
+            socket.on('userDisconnected',userID => {
+              console.log("leave meeting:" + userID);
               navigation.navigate('InMeeting', {
                 remoteStream: null,
               });
