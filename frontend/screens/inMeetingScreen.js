@@ -29,6 +29,14 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [chat, setChat] = useState('');
   const [chatModal, setChatModal] = useState(false);
   const [noteModal, setNoteModal] = useState(false);
+  const [createVoteModal, setCreateVoteModal] = useState(false);
+  const [voteModal, setVoteModal] = useState(false);
+  const [question, setQuestion] = useState('');
+  const [option1, setOption1] = useState('');
+  const [option2, setOption2] = useState('');
+  const [voteQuestion, setVoteQuestion] = useState('');
+  const [voteOption1, setVoteOption1] = useState('');
+  const [voteOption2, setVoteOption2] = useState('');
 
   useEffect(() => {
     setMyStream(localStream);
@@ -37,7 +45,7 @@ const InMeetingScreen = ({ route, navigation }) => {
     var month = new Date().getMonth() + 1; //To get the Current Month
     var year = new Date().getFullYear(); //To get the Current Year  
     setNoteTitle("Meeting Note(" + date + "/" + month + "/" + year + ")");
-    
+
     PushNotification.createChannel(
       {
         channelId: "channel-id",
@@ -45,6 +53,14 @@ const InMeetingScreen = ({ route, navigation }) => {
         channelDescription: "A channel to categorise your notifications",
       },
     );
+
+      socket.on('emitvote', (question, option1,option2)=>{
+        setVoteQuestion(question);
+        setVoteOption1(option1);
+        setVoteOption2(option2);
+        setVoteModal(true);
+      })
+
   }, [])
 
   useEffect(() => {
@@ -55,7 +71,7 @@ const InMeetingScreen = ({ route, navigation }) => {
     socket.on('emitchat', msg => {
       setMeetingchat([...meetingchat, msg])
     })
-   
+
   }, [meetingchat])
 
   // connect to peer server
@@ -110,7 +126,7 @@ const InMeetingScreen = ({ route, navigation }) => {
       })
 
       socket.on('emitchat', msg => {
-          pushMeetingChat("Meeting Chat",msg);
+        pushMeetingChat("Meeting Chat", msg);
       })
 
     } else {
@@ -158,6 +174,15 @@ const InMeetingScreen = ({ route, navigation }) => {
     setChat("");
   }
 
+  let createVote = () => {
+    console.log(question,option1,option2);
+    socket.emit('vote', question, option1, option2);
+    setQuestion("");
+    setOption1("");
+    setOption2("");
+    setCreateVoteModal(!createVoteModal)
+  }
+
   let endMeeting = () => {
 
     socket.emit('leave-room', roomID, myuserID);
@@ -191,7 +216,8 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
         <Icon style={{ paddingHorizontal: 5 }} name={'comment-text-multiple'} size={30} onPress={() => setChatModal(true)} />
         <Icon style={{ paddingHorizontal: 5 }} name={'notebook'} size={30} onPress={() => setNoteModal(true)} />
-        <Icons color="red" style={{ paddingLeft: 60 }} name={'call-end'} size={30} onPress={endMeeting} />
+        <Icon style={{ paddingHorizontal: 5 }} name={'chart-bar'} size={30} onPress={() => setCreateVoteModal(true)} />
+        <Icons color="red" style={{ paddingLeft: 45 }} name={'call-end'} size={30} onPress={endMeeting} />
       </View>
 
       <Modal
@@ -238,6 +264,57 @@ const InMeetingScreen = ({ route, navigation }) => {
             <TextInput multiline placeholder="Please enter your note here" onChangeText={text => setNote(text)} value={note} />
             <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
               <Button title="Close" onPress={() => setNoteModal(!noteModal)} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={createVoteModal}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setCreateVoteModal(!createVoteModal);
+        }}
+      >
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
+          <View style={{ backgroundColor: "white", width: 250 }}>
+            <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Create Poll</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
+            <TextInput placeholder="Please enter your question:" onChangeText={text => setQuestion(text)} value={question} />
+            <Text style={{ paddingLeft: 10 }}>Answer:</Text>
+            <TextInput placeholder="Please enter your option 1:" onChangeText={text => setOption1(text)} value={option1} />
+            <TextInput placeholder="Please enter your option 2:" onChangeText={text => setOption2(text)} value={option2} />
+            <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
+              <Button color="green" title="Create Poll" onPress={createVote} />
+            </View>
+            <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
+              <Button color="red" title="Cancel" onPress={() => setCreateVoteModal(!createVoteModal)} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={voteModal}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setVoteModal(!voteModal);
+        }}
+      >
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
+          <View style={{ backgroundColor: "white", width: 250 }}>
+            <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Create Poll</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteQuestion}</Text>
+            <Text style={{ paddingLeft: 10 }}>Answer:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteOption1}</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteOption2}</Text>
+            <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
+              <Button color="green" title="Submit" onPress={() => setVoteModal(!voteModal)} />
             </View>
           </View>
         </View>
