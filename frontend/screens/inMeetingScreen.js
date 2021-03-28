@@ -11,6 +11,7 @@ import {
 import { socket } from './meetingScreen';
 import { openDatabase } from 'react-native-sqlite-storage';
 import PushNotification from "react-native-push-notification";
+import RadioButtonRN from 'radio-buttons-react-native';
 
 //Connction to access the pre-populated user_db.sqlite
 var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
@@ -37,6 +38,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [voteQuestion, setVoteQuestion] = useState('');
   const [voteOption1, setVoteOption1] = useState('');
   const [voteOption2, setVoteOption2] = useState('');
+  const [option, setOption] = useState([]);
 
   useEffect(() => {
     setMyStream(localStream);
@@ -54,12 +56,13 @@ const InMeetingScreen = ({ route, navigation }) => {
       },
     );
 
-      socket.on('emitvote', (question, option1,option2)=>{
-        setVoteQuestion(question);
-        setVoteOption1(option1);
-        setVoteOption2(option2);
-        setVoteModal(true);
-      })
+    socket.on('emitvote', (question, option1, option2) => {
+      setVoteQuestion(question);
+      setVoteOption1(option1);
+      setVoteOption2(option2);
+      setVoteModal(true);
+      setOption([...option, { label: option1 }, { label: option2 }]);
+    })
 
   }, [])
 
@@ -175,7 +178,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   }
 
   let createVote = () => {
-    console.log(question,option1,option2);
+    console.log(question, option1, option2);
     socket.emit('vote', question, option1, option2);
     setQuestion("");
     setOption1("");
@@ -311,8 +314,10 @@ const InMeetingScreen = ({ route, navigation }) => {
             <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
             <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteQuestion}</Text>
             <Text style={{ paddingLeft: 10 }}>Answer:</Text>
-            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteOption1}</Text>
-            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteOption2}</Text>
+            <RadioButtonRN
+              data={option}
+              selectedBtn={(e) => console.log(e)}
+            />
             <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
               <Button color="green" title="Submit" onPress={() => setVoteModal(!voteModal)} />
             </View>
