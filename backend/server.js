@@ -23,6 +23,11 @@ io.on('connection',(socket) => {
             io.to(roomID).emit('emitvote',question, option1, option2);
         })
         
+        socket.to(roomID).on('submitvote', (answer) => {
+            console.log('selected answer:',answer.label);
+            io.to(roomID).emit('emitanswer',answer.label);
+        })
+        
     })
 
     socket.on('leave-room', (roomID,userID)=> {

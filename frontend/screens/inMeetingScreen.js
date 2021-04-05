@@ -16,6 +16,12 @@ import RadioButtonRN from 'radio-buttons-react-native';
 //Connction to access the pre-populated user_db.sqlite
 var db = openDatabase({ name: 'user_db.sqlite', createFromLocation: 1 });
 
+var total = 0;
+var percentageOfOption1 = 0;
+var percentageOfOption2 = 0;
+var numberOfOption1 = 0;
+var numberOfOption2 = 0;
+
 const InMeetingScreen = ({ route, navigation }) => {
   const { localStream, remoteStream, roomID, otherUserID, peer, username, user_id, myuserID } = route.params;
   const [camera, setCamera] = useState(true);
@@ -39,6 +45,9 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [voteOption1, setVoteOption1] = useState('');
   const [voteOption2, setVoteOption2] = useState('');
   const [option, setOption] = useState([]);
+  const [answer, setAnswer] = useState();
+  const [vote, setVote] = useState(false);
+  const [voteResultModal, setVoteResultModal]= useState(false);
 
   useEffect(() => {
     setMyStream(localStream);
@@ -61,7 +70,11 @@ const InMeetingScreen = ({ route, navigation }) => {
       setVoteOption1(option1);
       setVoteOption2(option2);
       setVoteModal(true);
-      setOption([...option, { label: option1 }, { label: option2 }]);
+      setOption([{ label: option1 }, { label: option2 }]);
+      socket.on('emitanswer', (answer) => {
+        calculateVote(answer, option1, option2);
+        setVoteResultModal(!voteResultModal);
+      })
     })
 
   }, [])
@@ -183,7 +196,44 @@ const InMeetingScreen = ({ route, navigation }) => {
     setQuestion("");
     setOption1("");
     setOption2("");
-    setCreateVoteModal(!createVoteModal)
+    setCreateVoteModal(!createVoteModal);
+    total = 0;
+    numberOfOption1 = 0;
+    numberOfOption2 = 0;
+    percentageOfOption1 = 0;
+    percentageOfOption2 = 0;
+  }
+
+  let submitVote = () => {
+    if (!answer){
+      alert('Please select the answer.');
+      return;
+    }
+
+    setVoteModal(!voteModal);
+    setVote(true);
+    console.log(answer);
+    socket.emit('submitvote', (answer));
+  }
+
+  let calculateVote = (answer, option1, option2) => {
+    console.log("answer:", answer);
+    console.log("option 1:", option1);
+    console.log("option 2:", option2);
+    total += 1;
+    if(answer == option1){
+      numberOfOption1 += 1;
+    }
+    else {
+      numberOfOption2 += 1;
+    }
+    percentageOfOption1 = (numberOfOption1 / total) * 100;
+    percentageOfOption2 = (numberOfOption2 / total) * 100;
+    console.log("Total:", total);
+    console.log("Number of option 1:", numberOfOption1);
+    console.log("Number of option 2:", numberOfOption2);
+    console.log("Percentage of option 1:", percentageOfOption1);
+    console.log("Percentage of Option 2:", percentageOfOption2);
   }
 
   let endMeeting = () => {
@@ -219,8 +269,9 @@ const InMeetingScreen = ({ route, navigation }) => {
         <Icon style={{ paddingHorizontal: 5 }} name={`${screen && 'arrow-down-bold-box' || 'arrow-up-bold-box'}`} size={30} onPress={shareScreen} />
         <Icon style={{ paddingHorizontal: 5 }} name={'comment-text-multiple'} size={30} onPress={() => setChatModal(true)} />
         <Icon style={{ paddingHorizontal: 5 }} name={'notebook'} size={30} onPress={() => setNoteModal(true)} />
-        <Icon style={{ paddingHorizontal: 5 }} name={'chart-bar'} size={30} onPress={() => setCreateVoteModal(true)} />
-        <Icons color="red" style={{ paddingLeft: 45 }} name={'call-end'} size={30} onPress={endMeeting} />
+        <Icon style={{ paddingHorizontal: 5 }} name={'vote'} size={30} onPress={() => setCreateVoteModal(true)} />
+        {vote && <Icon style={{ paddingHorizontal: 5 }} name={'chart-bar'} size={30} onPress={() => setVoteResultModal(true)} />}
+        <Icons color="red" style={{ paddingLeft: 30 }} name={'call-end'} size={30} onPress={endMeeting} />
       </View>
 
       <Modal
@@ -286,7 +337,7 @@ const InMeetingScreen = ({ route, navigation }) => {
             <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Create Poll</Text>
             <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
             <TextInput placeholder="Please enter your question:" onChangeText={text => setQuestion(text)} value={question} />
-            <Text style={{ paddingLeft: 10 }}>Answer:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop:5 }}>Answer:</Text>
             <TextInput placeholder="Please enter your option 1:" onChangeText={text => setOption1(text)} value={option1} />
             <TextInput placeholder="Please enter your option 2:" onChangeText={text => setOption2(text)} value={option2} />
             <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
@@ -310,16 +361,40 @@ const InMeetingScreen = ({ route, navigation }) => {
       >
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
           <View style={{ backgroundColor: "white", width: 250 }}>
-            <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Create Poll</Text>
+            <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Let's Vote</Text>
             <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
             <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteQuestion}</Text>
-            <Text style={{ paddingLeft: 10 }}>Answer:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop:5 }}>Answer:</Text>
             <RadioButtonRN
               data={option}
-              selectedBtn={(e) => console.log(e)}
+              selectedBtn={(e) => setAnswer(e)}
             />
             <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
-              <Button color="green" title="Submit" onPress={() => setVoteModal(!voteModal)} />
+              <Button color="green" title="Submit" onPress={submitVote} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={voteResultModal}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setVoteResultModal(!voteResultModal);
+        }}
+      >
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
+          <View style={{ backgroundColor: "white", width: 250 }}>
+            <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Poll Result</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
+            <Text style={{ paddingLeft: 10 }}>{voteQuestion}</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Answer:</Text>
+            <Text style={{ paddingLeft: 10 }}>{voteOption1 + ": " + percentageOfOption1 + "%"}</Text>
+            <Text style={{ paddingLeft: 10 }}>{voteOption2 + ": " + percentageOfOption2 + "%"}</Text>
+            <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
+              <Button title="Close" onPress={() => setVoteResultModal(!voteResultModal)} />
             </View>
           </View>
         </View>
