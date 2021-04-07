@@ -47,7 +47,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   const [option, setOption] = useState([]);
   const [answer, setAnswer] = useState();
   const [vote, setVote] = useState(false);
-  const [voteResultModal, setVoteResultModal]= useState(false);
+  const [voteResultModal, setVoteResultModal] = useState(false);
 
   useEffect(() => {
     setMyStream(localStream);
@@ -205,7 +205,7 @@ const InMeetingScreen = ({ route, navigation }) => {
   }
 
   let submitVote = () => {
-    if (!answer){
+    if (!answer) {
       alert('Please select the answer.');
       return;
     }
@@ -221,7 +221,7 @@ const InMeetingScreen = ({ route, navigation }) => {
     console.log("option 1:", option1);
     console.log("option 2:", option2);
     total += 1;
-    if(answer == option1){
+    if (answer == option1) {
       numberOfOption1 += 1;
     }
     else {
@@ -335,9 +335,9 @@ const InMeetingScreen = ({ route, navigation }) => {
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
           <View style={{ backgroundColor: "white", width: 250 }}>
             <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Create Poll</Text>
-            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5, fontWeight: "bold" }}>Question:</Text>
             <TextInput placeholder="Please enter your question:" onChangeText={text => setQuestion(text)} value={question} />
-            <Text style={{ paddingLeft: 10, paddingTop:5 }}>Answer:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5, fontWeight: "bold" }}>Answer:</Text>
             <TextInput placeholder="Please enter your option 1:" onChangeText={text => setOption1(text)} value={option1} />
             <TextInput placeholder="Please enter your option 2:" onChangeText={text => setOption2(text)} value={option2} />
             <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
@@ -364,7 +364,7 @@ const InMeetingScreen = ({ route, navigation }) => {
             <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Let's Vote</Text>
             <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
             <Text style={{ paddingLeft: 10, paddingTop: 5 }}>{voteQuestion}</Text>
-            <Text style={{ paddingLeft: 10, paddingTop:5 }}>Answer:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Answer:</Text>
             <RadioButtonRN
               data={option}
               selectedBtn={(e) => setAnswer(e)}
@@ -388,9 +388,9 @@ const InMeetingScreen = ({ route, navigation }) => {
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", }}>
           <View style={{ backgroundColor: "white", width: 250 }}>
             <Text style={{ fontWeight: "bold", textAlign: "center", backgroundColor: "#5E35B1", color: "white", height: 30, paddingTop: 5 }}>Poll Result</Text>
-            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Question:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5, fontWeight: "bold" }}>Question:</Text>
             <Text style={{ paddingLeft: 10 }}>{voteQuestion}</Text>
-            <Text style={{ paddingLeft: 10, paddingTop: 5 }}>Answer:</Text>
+            <Text style={{ paddingLeft: 10, paddingTop: 5, fontWeight: "bold" }}>Answer:</Text>
             <Text style={{ paddingLeft: 10 }}>{voteOption1 + ": " + percentageOfOption1 + "%"}</Text>
             <Text style={{ paddingLeft: 10 }}>{voteOption2 + ": " + percentageOfOption2 + "%"}</Text>
             <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>

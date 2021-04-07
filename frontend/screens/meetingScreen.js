@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { TextInput, View, Button, Text } from 'react-native';
 import io from "socket.io-client";
 import Peer from 'react-native-peerjs';
@@ -14,11 +14,6 @@ const MeetingScreen = ({ route, navigation }) => {
 
   const { username, user_id } = route.params;
   const [meetingcode, setMeetingcode] = useState('');
-
-  /*
-    useEffect(() => {
-     
-    }, [])*/
 
   // connect to peer server
   let peerConnection = () => {
