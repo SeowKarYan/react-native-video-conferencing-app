@@ -73,10 +73,10 @@ const MeetingScreen = ({ route, navigation }) => {
             myuserID: myuserID,
           });
 
-          // when participate is joinning into the room
+          // when participant is joinning into the room
           socket.on('userConnected', (userID) => {
 
-            // host calling the participate
+            // host calling the participant
             const call = myPeer.call(userID, stream);
             call.on('stream', userVideoStream => {
               navigation.navigate('InMeeting', {
@@ -85,7 +85,7 @@ const MeetingScreen = ({ route, navigation }) => {
               });
             })
 
-            // get share screen stream if participate share screen
+            // get share screen stream if participant share screen
             myPeer.on('call', call => {
               call.answer(stream);
               call.on('stream', userVideoStream => {
@@ -112,7 +112,7 @@ const MeetingScreen = ({ route, navigation }) => {
     });
   }
 
-  // When participate join into meeting room
+  // When participant join into meeting room
   let joinMeeting = () => {
 
     const myPeer = peerConnection();
@@ -145,7 +145,7 @@ const MeetingScreen = ({ route, navigation }) => {
       })
         .then(stream => {
 
-          // participate answer the call
+          // participant answer the call
           myPeer.on('call', call => {
             call.answer(stream);
             call.on('stream', userVideoStream => {
