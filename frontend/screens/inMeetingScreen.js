@@ -191,6 +191,18 @@ const InMeetingScreen = ({ route, navigation }) => {
   }
 
   let createVote = () => {
+    if (!question) {
+      alert('Please fill in the question field.');
+      return;
+    }
+    if (!option1) {
+      alert('Please fill in the first answer field.');
+      return;
+    }
+    if (!option2) {
+      alert('Please fill in the second answer field.');
+      return;
+    }
     console.log(question, option1, option2);
     socket.emit('vote', question, option1, option2);
     setQuestion("");
